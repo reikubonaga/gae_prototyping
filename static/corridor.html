@@ -91,12 +91,20 @@
   stats.domElement.style.position = 'absolute';
   stats.domElement.style.top = '0px';
   container.appendChild( stats.domElement );
-        
+  console.log("event start");
   $(document).mousewheel(onDocumentMouseWheel);
 }
-
+camera_p = camera.position;
+before_z = 0;
 function onDocumentMouseWheel( event,delta ) {
-  camera.position.z = camera.position.z-(4*delta);
+  var z = camera_p.z;
+  before_z = delta;
+  camera_p.z = (z-10*delta-20*before_z)|0;
+  return;
+  if(z != ((z-10*delta)|0)){
+  }else{
+    console.log("test");
+  }
 }
 
 function animate() {
