@@ -21,8 +21,8 @@
 <script>
   var container;
   
-  var camera, scene, renderer;
-  
+  var camera, scene, renderer, objects = [], images = [];
+  var projector = new THREE.Projector();  
   init();
   animate();
 
@@ -63,17 +63,23 @@
           
     if(x>200){
       materials2[1] = material;
-    }else{
+    }else{      
       materials2[0] = material;
     }
-          
     
     cube = new THREE.Mesh( new THREE.CubeGeometry( 3, 70, 70, 1, 1, 1, materials2 ), new THREE.MeshFaceMaterial() );
     cube.position.x = x>200?x-13:x+13;
     cube.position.y = 150;
     cube.position.z = 80*z_i+3;
+    cube.action = {url:url,z:cube.position.z+40};
+    if(x>200){
+      cube.action.p = Math.PI/2;
+    }else{
+      cube.action.p = Math.PI/2*3;
+    }
     cube.overdraw = true;
     scene.add( cube );
+    objects.push(cube);
   }
         
   for(var i=0;i<8;++i){
@@ -91,6 +97,8 @@
   var min_i = 0;
   var max_i = i;
   function onDocumentMouseWheel( event,delta ) {
+    moveCamera(Math.PI);
+
     var z = camera_p.z;
     if(z/80<min_i+8){
       for(var i=0;i<8;++i){
@@ -100,37 +108,62 @@
       }
     }  
     before_z = delta;
-    camera_p.z = (z+10*delta+20*before_z)|0;
+    camera_p.z = (z+20*delta+50*before_z)|0;
   
   }
   $(document).mousewheel(onDocumentMouseWheel);
   p = Math.PI;
   //スクロールの動作
   function onDocumentMouseDown(e){
-    var first_x = e.pageX;
-    var first_y = e.pageY;
-    var old_x = first_x;
-    var old_y = first_y;
-    function onDocumentMouseMove(e){
-      var x = e.pageX;
-      var y = e.pageY;
-      var n_p = p + ((-old_x+x)/100);
-      if(n_p > Math.PI+2.2) return;
-      if(n_p < Math.PI-2.2) return;
-      p = n_p;
-      camera.lookAt(new THREE.Vector3(camera_p.x+Math.sin(p),camera_p.y,camera_p.z+Math.cos(p)) );      
-      old_x = x;
-      old_y = y;
+    var mouse_x =   ((e.pageX-e.target.offsetParent.offsetLeft) / renderer.domElement.width)  * 2 - 1;
+    var mouse_y = - ((e.pageY-e.target.offsetParent.offsetTop) / renderer.domElement.height) * 2 + 1;
+    var vector = new THREE.Vector3(mouse_x, mouse_y, 0.5);
+    projector.unprojectVector(vector, camera);
+    var ray = new THREE.Ray(camera.position, vector.subSelf(camera.position).normalize());
+
+    var intersects = ray.intersectObjects( objects );
+    if ( intersects.length > 0 ) {
+      action = intersects[0].object.action;
+      //camera_p.z = action.z;
+      moveRoad(action.z);
+      moveCamera(action.p);
     }
-    
-    function onDocumentMouseUp(e){
-      $(document).unbind("mousemove",onDocumentMouseMove);
-      $(document).unbind("mouseup",onDocumentMouseUp);
-    }
-    $(document).bind("mousemove",onDocumentMouseMove);
-    $(document).bind("mouseup",onDocumentMouseUp);
   }
   $(document).mousedown(onDocumentMouseDown);
+  var lock = false;
+  function moveCamera(n_p){
+    if(lock) return;
+    if(n_p==p) return;
+    lock = true;
+    var start_p = p;
+    function move(){
+      p += (n_p-start_p)/10;
+      camera.lookAt(new THREE.Vector3(camera_p.x+Math.sin(p),camera_p.y,camera_p.z+Math.cos(p)) );
+    }
+    function end(){
+      p = n_p;
+      camera.lookAt(new THREE.Vector3(camera_p.x+Math.sin(p),camera_p.y,camera_p.z+Math.cos(p)) );
+      lock = false;
+    }
+    for(i=0;i<9;++i){
+      setTimeout(move,50*i);
+    }
+    setTimeout(end,50*10);
+  }
+
+  function moveRoad(n_p){
+    if(n_p==camera_p.z) return;
+    var start_p = camera_p.z;
+    var now_p = start_p;
+    function move(){
+      now_p += (n_p-start_p)/10;
+      console.log(now_p);
+      camera_p.z = now_p;
+    }
+    for(i=0;i<10;++i){
+      setTimeout(move,50*i);
+    }
+  }
 
   
 }
