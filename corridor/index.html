@@ -14,13 +14,12 @@
       </style>
     </head>
   <body>
-    <script src="js/three.js"></script>
+    <script src="/static/js/three.js"></script>
 
-    <script src="js/Stats.js"></script>
-    <script src="js/jquery.js"></script>
-    <script src="js/jquery.mousewheel.js"></script>
+    <script src="/static/js/jquery.js"></script>
+    <script src="/static/js/jquery.mousewheel.js"></script>
 <script>
-  var container, stats;
+  var container;
   
   var camera, scene, renderer;
   
@@ -40,7 +39,7 @@
   camera.position.z = 600;
   scene.add( camera );
   
-  // Cube
+  // 壁と額を設置
   var materials = [];
   for ( var i = 0; i < 6; i ++ ) {
     materials.push( new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
@@ -51,7 +50,7 @@
   }
   function make_cube(x,z_i){
     if(Math.abs(z_i) % 4==3) return;
-    url = "img/emi_photo.jpg";
+    url = "/static/img/emi_photo.jpg";
     var texture  = new THREE.ImageUtils.loadTexture(url);
     var material = new THREE.MeshLambertMaterial({map: texture});
 
@@ -70,7 +69,7 @@
           
     
     cube = new THREE.Mesh( new THREE.CubeGeometry( 3, 70, 70, 1, 1, 1, materials2 ), new THREE.MeshFaceMaterial() );
-    cube.position.x = x>200?x-10:x+10;
+    cube.position.x = x>200?x-13:x+13;
     cube.position.y = 150;
     cube.position.z = 80*z_i+3;
     cube.overdraw = true;
@@ -86,11 +85,7 @@
 
   container.appendChild( renderer.domElement );
 
-  stats = new Stats();
-  stats.domElement.style.position = 'absolute';
-  stats.domElement.style.top = '0px';
-  container.appendChild( stats.domElement );
-
+  //スクロールの動作
   var camera_p = camera.position;
   var before_z = 0;
   var min_i = 0;
@@ -103,14 +98,40 @@
         make_cube(0,min_i);
         make_cube(400,min_i);
       }
-    }
-
+    }  
     before_z = delta;
-    camera_p.z = (z-10*delta-20*before_z)|0;
+    camera_p.z = (z+10*delta+20*before_z)|0;
+  
   }
-
-
   $(document).mousewheel(onDocumentMouseWheel);
+  p = Math.PI;
+  //スクロールの動作
+  function onDocumentMouseDown(e){
+    var first_x = e.pageX;
+    var first_y = e.pageY;
+    var old_x = first_x;
+    var old_y = first_y;
+    function onDocumentMouseMove(e){
+      var x = e.pageX;
+      var y = e.pageY;
+      var n_p = p + ((-old_x+x)/100);
+      if(n_p > Math.PI+2.2) return;
+      if(n_p < Math.PI-2.2) return;
+      p = n_p;
+      camera.lookAt(new THREE.Vector3(camera_p.x+Math.sin(p),camera_p.y,camera_p.z+Math.cos(p)) );      
+      old_x = x;
+      old_y = y;
+    }
+    
+    function onDocumentMouseUp(e){
+      $(document).unbind("mousemove",onDocumentMouseMove);
+      $(document).unbind("mouseup",onDocumentMouseUp);
+    }
+    $(document).bind("mousemove",onDocumentMouseMove);
+    $(document).bind("mouseup",onDocumentMouseUp);
+  }
+  $(document).mousedown(onDocumentMouseDown);
+
   
 }
 
@@ -118,7 +139,6 @@
 function animate() {
   requestAnimationFrame( animate );
   render();
-  //stats.update();
 }
 
 function render() {

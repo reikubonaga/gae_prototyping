@@ -14,19 +14,18 @@
       </style>
     </head>
   <body>
-    <script src="js/three.js"></script>
+    <script src="/static/js/three.js"></script>
 
-    <script src="js/Stats.js"></script>
-    <script src="js/jquery.js"></script>
-    <script src="js/jquery.mousewheel.js"></script>
+    <script src="/static/js/jquery.js"></script>
+    <script src="/static/js/jquery.mousewheel.js"></script>
 <script>
-  var container, stats;
+  var container;
   
   var camera, scene, renderer;
   
   init();
   animate();
-  
+
   function init() {
   
   container = document.createElement( 'div' );
@@ -40,7 +39,7 @@
   camera.position.z = 600;
   scene.add( camera );
   
-  // Cube
+  // 壁と額を設置
   var materials = [];
   for ( var i = 0; i < 6; i ++ ) {
     materials.push( new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
@@ -50,8 +49,8 @@
     materials2.push( new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
   }
   function make_cube(x,z_i){
-          
-    url = "img/emi_photo.jpg";
+    if(Math.abs(z_i) % 4==3) return;
+    url = "/static/img/emi_photo.jpg";
     var texture  = new THREE.ImageUtils.loadTexture(url);
     var material = new THREE.MeshLambertMaterial({map: texture});
 
@@ -68,14 +67,13 @@
       materials2[0] = material;
     }
           
-          
-    cube = new THREE.Mesh( new THREE.CubeGeometry( 5, 70, 70, 1, 1, 1, materials2 ), new THREE.MeshFaceMaterial() );
-    cube.position.x = x>200?x-10:x+10;
+    
+    cube = new THREE.Mesh( new THREE.CubeGeometry( 3, 70, 70, 1, 1, 1, materials2 ), new THREE.MeshFaceMaterial() );
+    cube.position.x = x>200?x-13:x+13;
     cube.position.y = 150;
-    cube.position.z = 80*z_i;
+    cube.position.z = 80*z_i+3;
     cube.overdraw = true;
     scene.add( cube );
-        
   }
         
   for(var i=0;i<8;++i){
@@ -87,25 +85,60 @@
 
   container.appendChild( renderer.domElement );
 
-  stats = new Stats();
-  stats.domElement.style.position = 'absolute';
-  stats.domElement.style.top = '0px';
-  container.appendChild( stats.domElement );
+  //スクロールの動作
+  var camera_p = camera.position;
+  var before_z = 0;
+  var min_i = 0;
+  var max_i = i;
+  function onDocumentMouseWheel( event,delta ) {
+    var z = camera_p.z;
+    if(z/80<min_i+8){
+      for(var i=0;i<8;++i){
+        min_i = min_i-1;
+        make_cube(0,min_i);
+        make_cube(400,min_i);
+      }
+    }  
+    before_z = delta;
+    camera_p.z = (z+10*delta+20*before_z)|0;
+  
+  }
   $(document).mousewheel(onDocumentMouseWheel);
+  p = Math.PI;
+  //スクロールの動作
+  function onDocumentMouseDown(e){
+    var first_x = e.pageX;
+    var first_y = e.pageY;
+    var old_x = first_x;
+    var old_y = first_y;
+    function onDocumentMouseMove(e){
+      var x = e.pageX;
+      var y = e.pageY;
+      var n_p = p + ((-old_x+x)/100);
+      if(n_p > Math.PI+2.2) return;
+      if(n_p < Math.PI-2.2) return;
+      p = n_p;
+      camera.lookAt(new THREE.Vector3(camera_p.x+Math.sin(p),camera_p.y,camera_p.z+Math.cos(p)) );      
+      old_x = x;
+      old_y = y;
+    }
+    
+    function onDocumentMouseUp(e){
+      $(document).unbind("mousemove",onDocumentMouseMove);
+      $(document).unbind("mouseup",onDocumentMouseUp);
+    }
+    $(document).bind("mousemove",onDocumentMouseMove);
+    $(document).bind("mouseup",onDocumentMouseUp);
+  }
+  $(document).mousedown(onDocumentMouseDown);
+
+  
 }
 
-camera_p = camera.position;
-before_z = 0;
-function onDocumentMouseWheel( event,delta ) {
-  var z = camera_p.z;
-  before_z = delta;
-  camera_p.z = (z-10*delta-20*before_z)|0;
-}
 
 function animate() {
   requestAnimationFrame( animate );
   render();
-  stats.update();
 }
 
 function render() {
