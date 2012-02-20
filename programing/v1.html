@@ -1,0 +1,40 @@
+<html>
+<head>
+<script src="/static/js/jquery.js"
+<script src="/static/js/json2.js"></script>
+<script src="/static/js/underscore.js"></script>
+<script src="/static/js/backbone.js"></script>
+<script src="js/v1.js"></script>
+</head>
+<body>
+<div id="content-wrap">
+  <div id="content">
+    <h1>question</h1>
+    <div id="question-content"></div>
+    <h1>answer</h1>
+    <div id="answer-content"></div>
+  </div>
+</div>
+<script id="question-content-template" type="text/template">
+<div>title</div>
+<div>
+  <textarea class="question"></textarea>
+</div>
+<div>variable</div>
+<div>
+  <textarea class="variable"></textarea>
+</div>
+<div>
+  <div>answer</div>
+  <input class="answer"></input>
+</div>
+</script>
+<script id="answer-content-template" type="text/template">
+<div>
+  <textarea class="answer"></textarea>
+  <button class="check">check it</button>
+</div>
+</script>
+
+</body>
+</html>
