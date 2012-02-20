@@ -11,6 +11,9 @@ handlers:
 - url: /corridor
   static_dir: corridor
 
+- url: /programing
+  static_dir: programing
+
 - url: /static
   static_dir: static
 
