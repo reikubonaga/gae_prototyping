@@ -4,40 +4,23 @@ Code.models ?= {}
 class Code.models.Question extends Backbone.Model
   url:"/programing/question"
 
+class Code.models.Questions extends Backbone.Collection
+  url:"/programing/questions"
+
 $ ->
-  class Code.TitleView extends Backbone.View
-    el:"#title-content"
-    initialize: ->
+  class Code.PostView extends Backbone.View
+    el:"#content"
+    initialize:->
+      $("#header_menu li").removeClass("active")
+      $("#header_menu .post").addClass("active")
       @render()
-    template:_.template $("#title-content-template").html()
-    render: ->
-      $(@el).html @template()
-
-  class Code.QuestionView extends Backbone.View
-    el:"#question-content"
-    initialize: ->
-      @render()
-    template:_.template $("#question-content-template").html()
-    render: ->
-      $(@el).html @template()
-      $("#variable").css("width",$("#variable").width()+"px")
-      $("#variable").css("height",$("#variable").height()+"px")
-      editor = ace.edit "variable"
-      editor.renderer.setShowGutter false
-      JavaScriptMode = require("ace/mode/javascript").Mode
-      EditSession = require("ace/edit_session").EditSession
-      lang = require "ace/lib/lang"
-      Range = require("ace/range").Range
-      editor.getSession().setMode(new JavaScriptMode())
-      @variable = editor
-
-  class Code.AnswerView extends Backbone.View
-    el:"#answer-content"
+      @delegateEvents()
+    template:_.template $("#post-content-template").html()
     events:
       "click .check":"check"
       "click .post":"post"
     check:->
-      variable = Code.questionView.variable.getSession().getValue()
+      variable = @variable.getSession().getValue()
       answer = @editor.getSession().getValue()
       Code.answer = $("#answer_num").val()
       eval "Code.exe = function(){"+variable+answer+"}"
@@ -47,8 +30,7 @@ $ ->
       else
         alert("unsuccess "+user_ans)
     post:->
-      console.log "post"
-      variable = Code.questionView.variable.getSession().getValue()
+      variable = @variable.getSession().getValue()
       answer = @editor.getSession().getValue()
       title = $("#title").val()
       question = $("#question").val()
@@ -62,12 +44,20 @@ $ ->
       )
       question_model.save()
 
-    initialize: ->
-      @render()
-    template:_.template $("#answer-content-template").html()
+    render:->
+      @$el.html @template()
 
-    render: ->
-      $(@el).html @template()
+      $("#variable").css("width",$("#variable").width()+"px")
+      $("#variable").css("height",$("#variable").height()+"px")
+      editor = ace.edit "variable"
+      editor.renderer.setShowGutter false
+      JavaScriptMode = require("ace/mode/javascript").Mode
+      EditSession = require("ace/edit_session").EditSession
+      lang = require "ace/lib/lang"
+      Range = require("ace/range").Range
+      editor.getSession().setMode(new JavaScriptMode())
+      @variable = editor
+
       $("#answer").css("width",$("#answer").width()+"px")
       #$("#answer").css("height",$("#answer").height()+"px")
       editor = ace.edit "answer"
@@ -77,8 +67,54 @@ $ ->
       Range = require("ace/range").Range
       editor.getSession().setMode(new JavaScriptMode())
       @editor = editor
-      #editor.getSession().setValue(document.getElementById("main").innerHTML())
 
-  Code.questionView = new Code.QuestionView
-  Code.answerView = new Code.AnswerView
-  Code.titleView = new Code.TitleView
+  class Code.TopView extends Backbone.View
+    el:"#content"
+    initialize:->
+      $("#header_menu li").removeClass("active")
+      $("#header_menu .try").addClass("active")
+      @render()
+      Code.topQuestionView = new Code.TopQuestionView
+    template:_.template $("#top-content-template").html()
+    render:->
+      @$el.html @template()
+
+  class Code.TopQuestionView extends Backbone.View
+    initialize: ->
+      @setElement("#top-question-content")
+      @render()
+    template:(model)->
+      _.template($("#top-question-template").html(),model)
+    render: ->
+      Questions = new Code.models.Questions
+      self = @
+      Questions.fetch(
+        success:(collection)->
+          for model in collection.toJSON()
+            $(self.el).append self.template model
+      )
+
+  class Code.TryView extends Backbone.View
+    el:"#content"
+    initialize:->
+      $("#header_menu li").removeClass("active")
+      $("#header_menu .try").addClass("active")
+      @render()
+    template:_.template $("#try-content-template").html()
+    render:->
+      @$el.html @template()
+
+  class Code.workspace extends Backbone.Router
+    routes:
+      "":"top"
+      "post":"post"
+      "try/:question_id":"try"
+    try:(id)->
+      console.log id
+    top:->
+      Code.topView = new Code.TopView
+    post:->
+      Code.postView = new Code.PostView
+
+  route = new Code.workspace
+  Backbone.history.start()
