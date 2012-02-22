@@ -5,6 +5,29 @@
   if (typeof Code === "undefined" || Code === null) Code = {};
 
   $(function() {
+    Code.TitleView = (function(_super) {
+
+      __extends(TitleView, _super);
+
+      function TitleView() {
+        TitleView.__super__.constructor.apply(this, arguments);
+      }
+
+      TitleView.prototype.el = "#title-content";
+
+      TitleView.prototype.initialize = function() {
+        return this.render();
+      };
+
+      TitleView.prototype.template = _.template($("#title-content-template").html());
+
+      TitleView.prototype.render = function() {
+        return $(this.el).html(this.template());
+      };
+
+      return TitleView;
+
+    })(Backbone.View);
     Code.QuestionView = (function(_super) {
 
       __extends(QuestionView, _super);
@@ -22,7 +45,18 @@
       QuestionView.prototype.template = _.template($("#question-content-template").html());
 
       QuestionView.prototype.render = function() {
-        return $(this.el).html(this.template());
+        var EditSession, JavaScriptMode, Range, editor, lang;
+        $(this.el).html(this.template());
+        $("#variable").css("width", $("#variable").width() + "px");
+        $("#variable").css("height", $("#variable").height() + "px");
+        editor = ace.edit("variable");
+        editor.renderer.setShowGutter(false);
+        JavaScriptMode = require("ace/mode/javascript").Mode;
+        EditSession = require("ace/edit_session").EditSession;
+        lang = require("ace/lib/lang");
+        Range = require("ace/range").Range;
+        editor.getSession().setMode(new JavaScriptMode());
+        return this.variable = editor;
       };
 
       return QuestionView;
@@ -44,10 +78,10 @@
 
       AnswerView.prototype.check = function() {
         var answer, user_ans, variable;
-        variable = Code.questionView.$(".variable").val();
+        variable = Code.questionView.variable.getSession().getValue();
         answer = this.editor.getSession().getValue();
         eval("Code.exe = function(){" + variable + answer + "}");
-        Code.answer = Code.questionView.$(".answer").val();
+        Code.answer = $("#answer_num").val();
         user_ans = Code.exe();
         if (Number(Code.answer) === Number(user_ans)) {
           return alert("success " + user_ans);
@@ -65,7 +99,8 @@
       AnswerView.prototype.render = function() {
         var EditSession, JavaScriptMode, Range, editor, lang;
         $(this.el).html(this.template());
-        editor = ace.edit("editor");
+        $("#answer").css("width", $("#answer").width() + "px");
+        editor = ace.edit("answer");
         JavaScriptMode = require("ace/mode/javascript").Mode;
         EditSession = require("ace/edit_session").EditSession;
         lang = require("ace/lib/lang");
@@ -78,7 +113,8 @@
 
     })(Backbone.View);
     Code.questionView = new Code.QuestionView;
-    return Code.answerView = new Code.AnswerView;
+    Code.answerView = new Code.AnswerView;
+    return Code.titleView = new Code.TitleView;
   });
 
 }).call(this);

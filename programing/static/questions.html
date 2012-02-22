@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+	<title>Protyping Lab Programing</title>
+	<meta charset="utf-8">
+  <script src="/static/js/jquery.js"></script>
+  <script src="/static/js/json2.js"></script>
+  <script src="/static/js/underscore.js"></script>
+  <script src="/static/js/autoresize.jquery.js"></script>
+  <script src="/static/js/backbone.js"></script>
+  <link href="/static/css/bootstrap.css" rel="stylesheet">
+  <link href="/static/css/bootstrap-responsive.css" rel="stylesheet">
+  <link href="css/index.css" rel="stylesheet">
+</head>
+<body>
+
+
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container-fluid">
+      <a class="brand" href="#">Prototyping Lab Programing</a>
+      <div class="nav-collapse">
+        <ul class="nav">
+          <li class="active"><a>try question</a></li>
+          <li><a>post question</a></li>
+        </ul>
+        <p class="navbar-text pull-right"><a href="#">username</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="content-wrap">
+  <div id="content" class="container-fluid">
+    <div id="title-content"></div>
+  </div>
+</div>
+
+<script id="title-content-template" type="text/template">
+<div class="row-fluid" >
+  <div class="span2" id="title-label">
+    <a>
+      <%=title%>
+    </a>
+  </div>
+  <div class="span10">
+    <div><%=question%></div>
+  </div>
+</div>
+</script>
+
+<script src="js/questions.js"></script>
+
+</body>
+</html>
