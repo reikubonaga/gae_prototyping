@@ -11,8 +11,11 @@ handlers:
 - url: /corridor
   static_dir: corridor
 
-- url: /programing
-  static_dir: programing
+- url: /programing/static
+  static_dir: programing/static
+
+- url: /programing.*
+  script: programing/programing.py
 
 - url: /static
   static_dir: static
