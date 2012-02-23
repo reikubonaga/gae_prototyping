@@ -24,7 +24,10 @@
           <li class="try"><a href="#">try question</a></li>
           <li class="post"><a href="#post">post question</a></li>
         </ul>
-        <p class="navbar-text pull-right"><a href="#">username</a></p>
+        <p class="navbar-text pull-right">
+          <!--<a href="#">username</a>-->
+          <a href="#">produced by rei</a>
+        </p>
       </div>
     </div>
   </div>
@@ -52,6 +55,14 @@
 </div>
 </script>
 
+<script id="post-variable-template" type="text/tempalte">a = 1;
+b = 2;</script>
+
+<script id="post-code-template" type="text/tempalte">function main(){
+  answer = $m.x("12x=4");
+  return answer;
+}</script>
+
 <script id="post-content-template" type="text/template">
   <div class="row-fluid">
     <div class="span2" id="title-label">
@@ -70,7 +81,7 @@
         </div>
         <div>
           <div>answer</div>
-          <input type="text" class="answer_num" id="answer_num" placeholder="answer">
+          <input type="text" class="answer" id="answer" placeholder="answer">
         </div>
       </div>
     </div>
@@ -87,7 +98,7 @@
           </ul>
         </div>
         <div>
-          <div id="answer"></div>
+          <div id="code"></div>
         </div>
       </div>
     </div>

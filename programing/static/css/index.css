@@ -26,10 +26,10 @@ textarea {
   -moz-border-radius: 5px;
   border-color: black;
 }
-#answer_num {
+#answer {
   width: 100%;
 }
-#answer {
+#code {
   width: 100%;
   height: 100%;
 }
