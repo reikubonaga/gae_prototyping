@@ -22,7 +22,19 @@ class MainHandler(webapp.RequestHandler):
 
 class QuestionHandler(webapp.RequestHandler):
     def get(self):
-        self.response.out.write("question get")
+        id = self.request.get("id")
+        if not id:
+            self.response.out.write("error")
+        question = Question.get_by_id(int(id))
+        self.response.out.write(simplejson.dumps({
+            "id":id,
+            "title" : question.title,
+            "code":question.code,
+            "answer":question.answer,
+            "question":question.question,
+            "variable":question.variable
+            }))
+        
     def post(self):
         data = simplejson.loads(self.request.body)
         question = Question(
@@ -41,9 +53,30 @@ class QuestionHandler(webapp.RequestHandler):
             "variable":data["variable"]
             }))
     def put(self):
-        self.response.out.write("question put")
+        data = simplejson.loads(self.request.body)
+        id = data["id"]
+        if not id:
+            self.response.out.write("error")
+        question = Question.get_by_id(int(id))
+        if "title" in data:
+            question.title = data["title"]
+        if "code" in data:
+            question.code = data["code"]
+        if "answer" in data:
+            question.answer = data["answer"]
+        if "question" in data:
+            question.question = data["question"]
+        if "variable" in data:
+            question.variable = data["variable"]
+        question.put()
+        self.response.out.write(simplejson.dumps(data))
     def delete(self):
-        self.response.out.write("question delete")
+        data = simplejson.loads(self.request.body)
+        id = data["id"]
+        if not id:
+            self.response.out.write("error")
+        question = Question.get_by_id(int(id))
+        #question.delete()
 
 class QuestionsHandler(webapp.RequestHandler):
     def get(self):
@@ -52,10 +85,7 @@ class QuestionsHandler(webapp.RequestHandler):
             questions.append({
                 "id":question.key().id(),
                 "title" : question.title,
-                "code":question.code,
-                "answer":question.answer,
-                "question":question.question,
-                "variable":question.variable
+                "question":question.question
                 })
         self.response.out.write(simplejson.dumps(questions))
         

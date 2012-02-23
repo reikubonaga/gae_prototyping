@@ -321,9 +321,7 @@ bindDropdown("doc", function(value) {
     var doc = docsByName[value].doc;
     var session = env.split.setSession(doc);
     session.name = doc.name;
-
     updateUIEditorOptions();
-
     env.editor.focus();
 });
 
