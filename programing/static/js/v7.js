@@ -391,10 +391,10 @@
       if (str.substring(0, 1) === "-") {
         str = "-" + str.substring(1).replace("-", "+-");
       } else {
-        str = str.replace(/-/g, "+-");
+        str = str.replace("-", "+-");
       }
-      str = str.replace(/\+--/g, "+");
-      str = str.replace(/--/g, "+");
+      str = str.replace("+--", "+");
+      str = str.replace("--", "+");
       return str;
     };
 

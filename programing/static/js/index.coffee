@@ -231,9 +231,9 @@ class Code.Math.Core
     if str.substring(0,1) is "-"
       str= "-"+str.substring(1).replace("-","+-")
     else
-      str=str.replace("-","+-")
-    str=str.replace("+--","+")
-    str=str.replace("--","+")
+      str=str.replace(/-/g,"+-")
+    str=str.replace(/\+--/g,"+")
+    str=str.replace(/--/g,"+")
     return str
 
   str_to_number:(str)->
