@@ -1,0 +1,58 @@
+#header-wrap {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+#content-wrap {
+  margin-top: 50px;
+}
+.container {
+  width: 100%;
+}
+#title-label {
+  text-align: right;
+}
+textarea {
+  width: 100%;
+}
+#variable {
+  height: 200px;
+}
+#variable-wrap {
+  height: 200px;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-color: black;
+}
+#answer {
+  width: 100%;
+}
+#code {
+  width: 100%;
+  height: 100%;
+}
+#check {
+  margin-left: 10px;
+}
+#submenu {
+  height: 30px;
+}
+#submenu ul {
+  list-style: none;
+  float: left;
+  left: 0;
+  margin: 0px;
+}
+#submenu li {
+  float: left;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+#title-question {
+  height: 120px;
+}
+#title-question textarea {
+  height: 100px;
+}

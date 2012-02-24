@@ -55,23 +55,125 @@ class Code.Math.Fragment
       return (-1*@x)+"/"+(-1*@y)
     else if @x > 0 and @y < 0
       return (-1*@x)+"/"+(-1*@y)
-    else if @x = 0
+    else if @x is 0
       return 0
-    else if @y = 0
+    else if @y is 0
       Code.Math.core.error "fragment error y=0"
       return
+    else if @y is 1
+      return @x
     else
       return @x+"/"+@y
 
-class Code.Math.Formula1
+class Code.Math.Formula
+  constructor: (@str) ->
+    @input_str = @str
+    @str = Code.Math.core.str_to_plus @str
+    @set @str
+  dimension:0
+  str:""
+  set:(str)->
+    str = Code.Math.core.str_to_plus str
+    @str = str
+    match_arr = str.match(/x(\d+)\+/i)
+    if match_arr is null
+      if str.match(/x\+/)
+        @dimension = 1
+        return @
+    max = 0
+    for match in match_arr
+      arr = match.match(/\d/)
+      if arr[0] > max
+        max = arr[0]
+    @dimension = Number(max)
+    @
+  set_num:(ins,num)->
+    if not num
+      return ins
+    if ins is 0
+      ins = Code.Math.core.str_to_number num
+    else
+      ins += Code.Math.core.str_to_number num
+    ins
+  create:(str)->
+    @set str
+    switch @dimension
+      when 1
+        f = new Code.Math.Formula1
+        f.set @str
+        return f
+      when 2
+        f = new Code.Math.Formula2
+        f.set @str
+        return f
+      else
+        Code.Math.core.error "formula create no dimension"
+        return @
+
+class Code.Math.Formula2 extends Code.Math.Formula
+  v:0
+  x1:0
+  x2:0
+  set:(str)->
+    arr = str.split "+"
+    for xarr in arr
+      varr = xarr.split "x"
+      if varr[0] is ""
+        varr[0] = 1
+      if varr[1] is ""
+        varr[1] = 1
+      if not varr[1]
+        @v = @set_num(@v,varr[0])
+        continue
+      if varr[1] is 1
+        console.log varr
+        @x1 = @set_num(@x1,varr[0])
+        continue
+      if varr[1] is "2"
+        @x2 = @set_num(@x2,varr[0])
+        continue
+  min:()->
+    if @x2 is 1
+      str = "x2"
+    else if @x2 is -1
+      str = "-x2"
+    else
+      str = @x2+"x2"
+    if @x1>0
+      if @x1 is 1
+        str += "+x"
+      else
+        str += "+"+@x1+"x"
+    else
+      if @x1 is -1
+        str += "-x"
+      else
+        str += @x1+"x"
+    if @v>0
+      str += "+"+@v
+    else
+      str += @v
+    str
+  exe:->
+    x2 = @x2
+    x = @x
+    v = @v
+    g = Code.Math.core.gcd(x,v)
+    if not g? or g is 0
+      Code.Math.core.error "formula1 exe error"
+      return
+    f = new Code.Math.Fragment
+    f.set_arr(-1*v/g,x/g)
+    f.format()
+
+class Code.Math.Formula1 extends Code.Math.Formula
   v:0
   x:0
   set_arr:(a,b)->
-    @x = a
-    @v = b
+    @x = Code.Math.core.str_to_number a
+    @v = Code.Math.core.str_to_number b
   #割り算はどうするか
   set:(str)->
-    str = Code.Math.core.str_to_plus str
     arr = str.split "+"
     for xarr in arr
       varr = xarr.split "x"
@@ -91,8 +193,11 @@ class Code.Math.Formula1
     x = @x
     v = @v
     g = Code.Math.core.gcd(x,v)
+    if not g? or g is 0
+      Code.Math.core.error "formula1 exe error"
+      return
     f = new Code.Math.Fragment
-    f.set_arr(-v/g,x/g)
+    f.set_arr(-1*v/g,x/g)
     f.format()
 
 class Code.Math.Core
@@ -100,8 +205,9 @@ class Code.Math.Core
     console.log "error"+text
   #最小公約数
   gcd:(a,b)->
-    if a is 0 or b is 0
-      return undefined
+    if not a? or not b? or a is 0 or b is 0
+      @error "undefind gcd"
+      return
     f = true
     r = a % b
     while r isnt 0
@@ -111,6 +217,9 @@ class Code.Math.Core
     return b
 
   str_to_plus:(str)->
+    if not str?
+      @error "undefind str_to_plus"
+      return
     e_arr = str.split "="
     if e_arr.length > 2
       @error "equal > 2"
@@ -123,16 +232,21 @@ class Code.Math.Core
       str= "-"+str.substring(1).replace("-","+-")
     else
       str=str.replace("-","+-")
+    str=str.replace("+--","+")
+    str=str.replace("--","+")
     return str
+
   str_to_number:(str)->
+    if typeof str is "number"
+      return str
     if str.substring(0,1) is "-"
       return -1*Number(str.substring 1)
     else
       return Number(str)
 
   x:(str)->
-    f = new Code.Math.Formula1
-    f.set str
+    f = new Code.Math.Formula
+    f = f.create str
     return f.exe()
 
 Code.Math.core = new Code.Math.Core
@@ -241,8 +355,6 @@ $ ->
     post:->
       variable = @variable.getSession().getValue()
       code = @code.getSession().getValue()
-      title = $("#title").val()
-      question = $("#question").val()
       @model.set(
         code:code
         variable:variable
@@ -258,28 +370,15 @@ $ ->
           self.model = model
           model = model.toJSON()
           self.$el.html self.template model
+
           $("#variable").css("width",$("#variable").width()+"px")
           $("#variable").css("height",$("#variable").height()+"px")
-          editor = ace.edit "variable"
-          editor.renderer.setShowGutter false
-          JavaScriptMode = require("ace/mode/javascript").Mode
-          EditSession = require("ace/edit_session").EditSession
-          lang = require "ace/lib/lang"
-          Range = require("ace/range").Range
-          editor.getSession().setMode(new JavaScriptMode())
-          self.variable = editor
-          editor.getSession().setValue model.variable
+          self.variable = Code.ace.render "variable"
+          self.variable.getSession().setValue model.variable
 
-          $("#answer").css("width",$("#answer").width()+"px")
-          #$("#answer").css("height",$("#answer").height()+"px")
-          editor = ace.edit "answer"
-          JavaScriptMode = require("ace/mode/javascript").Mode
-          EditSession = require("ace/edit_session").EditSession
-          lang = require "ace/lib/lang"
-          Range = require("ace/range").Range
-          editor.getSession().setMode(new JavaScriptMode())
-          self.editor = editor
-          editor.getSession().setValue model.code
+          $("#code").css("width",$("#code").width()+"px")
+          self.code = Code.ace.render "code"
+          self.code.getSession().setValue model.code
 
           self.delegateEvents()
       )

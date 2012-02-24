@@ -113,12 +113,10 @@
         return (-1 * this.x) + "/" + (-1 * this.y);
       } else if (this.x > 0 && this.y < 0) {
         return (-1 * this.x) + "/" + (-1 * this.y);
-      } else if (this.x === 0) {
+      } else if (this.x = 0) {
         return 0;
-      } else if (this.y === 0) {
+      } else if (this.y = 0) {
         Code.Math.core.error("fragment error y=0");
-      } else if (this.y === 1) {
-        return this.x;
       } else {
         return this.x + "/" + this.y;
       }
@@ -128,182 +126,22 @@
 
   })();
 
-  Code.Math.Formula = (function() {
+  Code.Math.Formula1 = (function() {
 
-    function Formula(str) {
-      this.str = str;
-      this.input_str = this.str;
-      this.str = Code.Math.core.str_to_plus(this.str);
-      this.set(this.str);
-    }
-
-    Formula.prototype.dimension = 0;
-
-    Formula.prototype.str = "";
-
-    Formula.prototype.set = function(str) {
-      var arr, match, match_arr, max, _i, _len;
-      str = Code.Math.core.str_to_plus(str);
-      this.str = str;
-      match_arr = str.match(/x(\d+)\+/i);
-      if (match_arr === null) {
-        if (str.match(/x\+/)) {
-          this.dimension = 1;
-          return this;
-        }
-      }
-      max = 0;
-      for (_i = 0, _len = match_arr.length; _i < _len; _i++) {
-        match = match_arr[_i];
-        arr = match.match(/\d/);
-        if (arr[0] > max) max = arr[0];
-      }
-      this.dimension = Number(max);
-      return this;
-    };
-
-    Formula.prototype.set_num = function(ins, num) {
-      if (!num) return ins;
-      if (ins === 0) {
-        ins = Code.Math.core.str_to_number(num);
-      } else {
-        ins += Code.Math.core.str_to_number(num);
-      }
-      return ins;
-    };
-
-    Formula.prototype.create = function(str) {
-      var f;
-      this.set(str);
-      switch (this.dimension) {
-        case 1:
-          f = new Code.Math.Formula1;
-          f.set(this.str);
-          return f;
-        case 2:
-          f = new Code.Math.Formula2;
-          f.set(this.str);
-          return f;
-        default:
-          Code.Math.core.error("formula create no dimension");
-          return this;
-      }
-    };
-
-    return Formula;
-
-  })();
-
-  Code.Math.Formula2 = (function(_super) {
-
-    __extends(Formula2, _super);
-
-    function Formula2() {
-      Formula2.__super__.constructor.apply(this, arguments);
-    }
-
-    Formula2.prototype.v = 0;
-
-    Formula2.prototype.x1 = 0;
-
-    Formula2.prototype.x2 = 0;
-
-    Formula2.prototype.set = function(str) {
-      var arr, varr, xarr, _i, _len, _results;
-      arr = str.split("+");
-      _results = [];
-      for (_i = 0, _len = arr.length; _i < _len; _i++) {
-        xarr = arr[_i];
-        varr = xarr.split("x");
-        if (varr[0] === "") varr[0] = 1;
-        if (varr[1] === "") varr[1] = 1;
-        if (!varr[1]) {
-          this.v = this.set_num(this.v, varr[0]);
-          continue;
-        }
-        if (varr[1] === 1) {
-          console.log(varr);
-          this.x1 = this.set_num(this.x1, varr[0]);
-          continue;
-        }
-        if (varr[1] === "2") {
-          this.x2 = this.set_num(this.x2, varr[0]);
-          continue;
-        } else {
-          _results.push(void 0);
-        }
-      }
-      return _results;
-    };
-
-    Formula2.prototype.min = function() {
-      var str;
-      if (this.x2 === 1) {
-        str = "x2";
-      } else if (this.x2 === -1) {
-        str = "-x2";
-      } else {
-        str = this.x2 + "x2";
-      }
-      if (this.x1 > 0) {
-        if (this.x1 === 1) {
-          str += "+x";
-        } else {
-          str += "+" + this.x1 + "x";
-        }
-      } else {
-        if (this.x1 === -1) {
-          str += "-x";
-        } else {
-          str += this.x1 + "x";
-        }
-      }
-      if (this.v > 0) {
-        str += "+" + this.v;
-      } else {
-        str += this.v;
-      }
-      return str;
-    };
-
-    Formula2.prototype.exe = function() {
-      var f, g, v, x, x2;
-      x2 = this.x2;
-      x = this.x;
-      v = this.v;
-      g = Code.Math.core.gcd(x, v);
-      if (!(g != null) || g === 0) {
-        Code.Math.core.error("formula1 exe error");
-        return;
-      }
-      f = new Code.Math.Fragment;
-      f.set_arr(-1 * v / g, x / g);
-      return f.format();
-    };
-
-    return Formula2;
-
-  })(Code.Math.Formula);
-
-  Code.Math.Formula1 = (function(_super) {
-
-    __extends(Formula1, _super);
-
-    function Formula1() {
-      Formula1.__super__.constructor.apply(this, arguments);
-    }
+    function Formula1() {}
 
     Formula1.prototype.v = 0;
 
     Formula1.prototype.x = 0;
 
     Formula1.prototype.set_arr = function(a, b) {
-      this.x = Code.Math.core.str_to_number(a);
-      return this.v = Code.Math.core.str_to_number(b);
+      this.x = a;
+      return this.v = b;
     };
 
     Formula1.prototype.set = function(str) {
       var arr, varr, xarr, _i, _len, _results;
+      str = Code.Math.core.str_to_plus(str);
       arr = str.split("+");
       _results = [];
       for (_i = 0, _len = arr.length; _i < _len; _i++) {
@@ -335,18 +173,14 @@
       x = this.x;
       v = this.v;
       g = Code.Math.core.gcd(x, v);
-      if (!(g != null) || g === 0) {
-        Code.Math.core.error("formula1 exe error");
-        return;
-      }
       f = new Code.Math.Fragment;
-      f.set_arr(-1 * v / g, x / g);
+      f.set_arr(-v / g, x / g);
       return f.format();
     };
 
     return Formula1;
 
-  })(Code.Math.Formula);
+  })();
 
   Code.Math.Core = (function() {
 
@@ -358,10 +192,7 @@
 
     Core.prototype.gcd = function(a, b) {
       var f, r;
-      if (!(a != null) || !(b != null) || a === 0 || b === 0) {
-        this.error("undefind gcd");
-        return;
-      }
+      if (a === 0 || b === 0) return;
       f = true;
       r = a % b;
       while (r !== 0) {
@@ -374,10 +205,6 @@
 
     Core.prototype.str_to_plus = function(str) {
       var e_arr;
-      if (!(str != null)) {
-        this.error("undefind str_to_plus");
-        return;
-      }
       e_arr = str.split("=");
       if (e_arr.length > 2) {
         this.error("equal > 2");
@@ -393,13 +220,10 @@
       } else {
         str = str.replace("-", "+-");
       }
-      str = str.replace("+--", "+");
-      str = str.replace("--", "+");
       return str;
     };
 
     Core.prototype.str_to_number = function(str) {
-      if (typeof str === "number") return str;
       if (str.substring(0, 1) === "-") {
         return -1 * Number(str.substring(1));
       } else {
@@ -409,8 +233,8 @@
 
     Core.prototype.x = function(str) {
       var f;
-      f = new Code.Math.Formula;
-      f = f.create(str);
+      f = new Code.Math.Formula1;
+      f.set(str);
       return f.exe();
     };
 
@@ -600,9 +424,11 @@
       };
 
       TryView.prototype.post = function() {
-        var code, variable;
+        var code, question, title, variable;
         variable = this.variable.getSession().getValue();
         code = this.code.getSession().getValue();
+        title = $("#title").val();
+        question = $("#question").val();
         this.model.set({
           code: code,
           variable: variable
@@ -619,16 +445,30 @@
             id: question_id
           },
           success: function(model) {
+            var EditSession, JavaScriptMode, Range, editor, lang;
             self.model = model;
             model = model.toJSON();
             self.$el.html(self.template(model));
             $("#variable").css("width", $("#variable").width() + "px");
             $("#variable").css("height", $("#variable").height() + "px");
-            self.variable = Code.ace.render("variable");
-            self.variable.getSession().setValue(model.variable);
-            $("#code").css("width", $("#code").width() + "px");
-            self.code = Code.ace.render("code");
-            self.code.getSession().setValue(model.code);
+            editor = ace.edit("variable");
+            editor.renderer.setShowGutter(false);
+            JavaScriptMode = require("ace/mode/javascript").Mode;
+            EditSession = require("ace/edit_session").EditSession;
+            lang = require("ace/lib/lang");
+            Range = require("ace/range").Range;
+            editor.getSession().setMode(new JavaScriptMode());
+            self.variable = editor;
+            editor.getSession().setValue(model.variable);
+            $("#answer").css("width", $("#answer").width() + "px");
+            editor = ace.edit("answer");
+            JavaScriptMode = require("ace/mode/javascript").Mode;
+            EditSession = require("ace/edit_session").EditSession;
+            lang = require("ace/lib/lang");
+            Range = require("ace/range").Range;
+            editor.getSession().setMode(new JavaScriptMode());
+            self.editor = editor;
+            editor.getSession().setValue(model.code);
             return self.delegateEvents();
           }
         });
