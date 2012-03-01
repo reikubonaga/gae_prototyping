@@ -1,11 +1,28 @@
 Code ?= {}
-Code.models ?= {}
+Code.rest ?= {}
 Code.utils ?= {}
+Code.views ?= {}
 
-class Code.models.Question extends Backbone.Model
+class Code.rest.MyProfile extends Backbone.Model
+  url:"/programing/me"
+  loaded:false
+  isLogin:(redirect_url)->
+    if loaded
+      if @get "login"
+        exe()
+      else
+
+    else
+      @load exe
+  load:(exe)->
+    @fetch
+      success:exe
+Code.rest.myProfile = new Code.rest.MyProfile
+
+class Code.rest.Question extends Backbone.Model
   url:"/programing/question"
 
-class Code.models.Questions extends Backbone.Collection
+class Code.rest.Questions extends Backbone.Collection
   url:"/programing/questions"
 
 class Code.Ace
@@ -282,7 +299,7 @@ $ ->
       title = $("#title").val()
       question = $("#question").val()
       answer = $("#answer").val()
-      question_model = new Code.models.Question(
+      question_model = new Code.rest.Question(
         title:title
         code:code
         answer:answer
@@ -324,12 +341,57 @@ $ ->
     template:(model)->
       _.template($("#top-question-template").html(),model)
     render: ->
-      Questions = new Code.models.Questions
+      Questions = new Code.rest.Questions
       self = @
       Questions.fetch(
         success:(collection)->
           for model in collection.toJSON()
             self.$el.append self.template model
+      )
+
+  class Code.EditView extends Backbone.View
+    initialize:->
+      el = @make "div"
+      @setElement el
+      $("#content").html ""
+      $("#content").append el
+      $("#header_menu li").removeClass("active")
+    template:(model)->
+      _.template( $("#edit-content-template").html(),model)
+    events:
+      "click .save":"save"
+      "click .delete":"delete"
+    save:->
+      variable = @variable.getSession().getValue()
+      code = @code.getSession().getValue()
+      @model.set(
+        code:code
+        variable:variable
+      )
+      @model.save()
+    delete:->
+      @model.destroy()
+    render:(question_id)->
+      self = @
+      Question = new Code.rest.Question
+      Question.fetch(
+        data:
+          id:question_id
+        success:(model)->
+          self.model = model
+          model = model.toJSON()
+          self.$el.html self.template model
+
+          $("#variable").css("width",$("#variable").width()+"px")
+          $("#variable").css("height",$("#variable").height()+"px")
+          self.variable = Code.ace.render "variable"
+          self.variable.getSession().setValue model.variable
+
+          $("#code").css("width",$("#code").width()+"px")
+          self.code = Code.ace.render "code"
+          self.code.getSession().setValue model.code
+
+          self.delegateEvents()
       )
 
   class Code.TryView extends Backbone.View
@@ -362,7 +424,7 @@ $ ->
       @model.save()
     render:(question_id)->
       self = @
-      Question = new Code.models.Question
+      Question = new Code.rest.Question
       Question.fetch(
         data:
           id:question_id
@@ -383,18 +445,46 @@ $ ->
           self.delegateEvents()
       )
 
+  class Code.HeaderView extends Backbone.View
+    el:"#header-right"
+    template:$("#header-content-template").html()
+    login_template:$("#header-login-content-template").html()
+    render:->
+      self = @
+      Code.rest.myProfile.load(
+        Code.FB.login((response)->
+          if response.authResponse
+            Code.FB.api('/me/friends',(response)->
+              self.friends = response["data"]
+            )
+          else
+            console.log "login error"
+        ,
+          scope: 'email,user_photos,friends_photos'
+        )
+      )
+
+
+
+
+
   class Code.workspace extends Backbone.Router
     routes:
       "":"top"
       "post":"post"
+      "edit/:question_id":"edit"
       "try/:question_id":"try"
     try:(id)->
       Code.tryView = new Code.TryView
       Code.tryView.render id
+    edit:(id)->
+      Code.editView = new Code.EditView
+      Code.editView.render id
     top:->
       Code.topView = new Code.TopView
     post:->
       Code.postView = new Code.PostView
-
+  Code.headerView = new Code.HeaderView
+  Code.headerView.render()
   route = new Code.workspace
   Backbone.history.start()

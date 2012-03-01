@@ -5,11 +5,49 @@
 
   if (typeof Code === "undefined" || Code === null) Code = {};
 
-  if (Code.models == null) Code.models = {};
+  if (Code.rest == null) Code.rest = {};
 
   if (Code.utils == null) Code.utils = {};
 
-  Code.models.Question = (function(_super) {
+  if (Code.views == null) Code.views = {};
+
+  Code.rest.MyProfile = (function(_super) {
+
+    __extends(MyProfile, _super);
+
+    function MyProfile() {
+      MyProfile.__super__.constructor.apply(this, arguments);
+    }
+
+    MyProfile.prototype.url = "/programing/me";
+
+    MyProfile.prototype.loaded = false;
+
+    MyProfile.prototype.isLogin = function(redirect_url) {
+      if (loaded) {
+        if (this.get("login")) {
+          return exe();
+        } else {
+
+        }
+      } else {
+        return this.load(exe);
+      }
+    };
+
+    MyProfile.prototype.load = function(exe) {
+      return this.fetch({
+        success: exe
+      });
+    };
+
+    return MyProfile;
+
+  })(Backbone.Model);
+
+  Code.rest.myProfile = new Code.rest.MyProfile;
+
+  Code.rest.Question = (function(_super) {
 
     __extends(Question, _super);
 
@@ -23,7 +61,7 @@
 
   })(Backbone.Model);
 
-  Code.models.Questions = (function(_super) {
+  Code.rest.Questions = (function(_super) {
 
     __extends(Questions, _super);
 
@@ -470,7 +508,7 @@
         title = $("#title").val();
         question = $("#question").val();
         answer = $("#answer").val();
-        question_model = new Code.models.Question({
+        question_model = new Code.rest.Question({
           title: title,
           code: code,
           answer: answer,
@@ -542,7 +580,7 @@
 
       TopQuestionView.prototype.render = function() {
         var Questions, self;
-        Questions = new Code.models.Questions;
+        Questions = new Code.rest.Questions;
         self = this;
         return Questions.fetch({
           success: function(collection) {
@@ -559,6 +597,74 @@
       };
 
       return TopQuestionView;
+
+    })(Backbone.View);
+    Code.EditView = (function(_super) {
+
+      __extends(EditView, _super);
+
+      function EditView() {
+        EditView.__super__.constructor.apply(this, arguments);
+      }
+
+      EditView.prototype.initialize = function() {
+        var el;
+        el = this.make("div");
+        this.setElement(el);
+        $("#content").html("");
+        $("#content").append(el);
+        return $("#header_menu li").removeClass("active");
+      };
+
+      EditView.prototype.template = function(model) {
+        return _.template($("#edit-content-template").html(), model);
+      };
+
+      EditView.prototype.events = {
+        "click .save": "save",
+        "click .delete": "delete"
+      };
+
+      EditView.prototype.save = function() {
+        var code, variable;
+        variable = this.variable.getSession().getValue();
+        code = this.code.getSession().getValue();
+        this.model.set({
+          code: code,
+          variable: variable
+        });
+        return this.model.save();
+      };
+
+      EditView.prototype["delete"] = function() {
+        return this.model.destroy();
+      };
+
+      EditView.prototype.render = function(question_id) {
+        var Question, self;
+        self = this;
+        Question = new Code.rest.Question;
+        return Question.fetch({
+          data: {
+            id: question_id
+          },
+          success: function(model) {
+            self.model = model;
+            model = model.toJSON();
+            self.$el.html(self.template(model));
+            $("#variable").css("width", $("#variable").width() + "px");
+            $("#variable").css("height", $("#variable").height() + "px");
+            self.variable = Code.ace.render("variable");
+            self.variable.getSession().setValue(model.variable);
+            $("#code").css("width", $("#code").width() + "px");
+            self.code = Code.ace.render("code");
+            self.code.getSession().setValue(model.code);
+            return self.delegateEvents();
+          }
+        });
+      };
+
+      return EditView;
 
     })(Backbone.View);
     Code.TryView = (function(_super) {
@@ -613,7 +719,7 @@
       TryView.prototype.render = function(question_id) {
         var Question, self;
         self = this;
-        Question = new Code.models.Question;
+        Question = new Code.rest.Question;
         return Question.fetch({
           data: {
             id: question_id
@@ -637,6 +743,39 @@
       return TryView;
 
     })(Backbone.View);
+    Code.HeaderView = (function(_super) {
+
+      __extends(HeaderView, _super);
+
+      function HeaderView() {
+        HeaderView.__super__.constructor.apply(this, arguments);
+      }
+
+      HeaderView.prototype.el = "#header-right";
+
+      HeaderView.prototype.template = $("#header-content-template").html();
+
+      HeaderView.prototype.login_template = $("#header-login-content-template").html();
+
+      HeaderView.prototype.render = function() {
+        var self;
+        self = this;
+        return Code.rest.myProfile.load(Code.FB.login(function(response) {
+          if (response.authResponse) {
+            return Code.FB.api('/me/friends', function(response) {
+              return self.friends = response["data"];
+            });
+          } else {
+            return console.log("login error");
+          }
+        }, {
+          scope: 'email,user_photos,friends_photos'
+        }));
+      };
+
+      return HeaderView;
+
+    })(Backbone.View);
     Code.workspace = (function(_super) {
 
       __extends(workspace, _super);
@@ -648,12 +787,18 @@
       workspace.prototype.routes = {
         "": "top",
         "post": "post",
+        "edit/:question_id": "edit",
         "try/:question_id": "try"
       };
 
       workspace.prototype["try"] = function(id) {
         Code.tryView = new Code.TryView;
         return Code.tryView.render(id);
+      };
+
+      workspace.prototype.edit = function(id) {
+        Code.editView = new Code.EditView;
+        return Code.editView.render(id);
       };
 
       workspace.prototype.top = function() {
@@ -667,6 +812,8 @@
       return workspace;
 
     })(Backbone.Router);
+    Code.headerView = new Code.HeaderView;
+    Code.headerView.render();
     route = new Code.workspace;
     return Backbone.history.start();
   });

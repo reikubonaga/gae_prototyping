@@ -8,8 +8,14 @@ handlers:
   static_files: favicon.ico
   upload: favicon\.ico
 
+- url: /lightbox
+  static_dir: lightbox
+
 - url: /corridor
   static_dir: corridor
+
+- url: /expression
+  static_dir: expression
 
 - url: /programing/static
   static_dir: programing/static

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block header %}
+<a id="profile-image">
+  <img height="25" width="25" src="http://graph.facebook.com/{{ current_user.id }}/picture"/>
+</a>
+<a href="{{ current_user.profile_url|escape }}">
+  {{current_user.name}}
+</a>
+{% endblock %}

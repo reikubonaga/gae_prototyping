@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+<title>WebGL "Ginger" manipulation demo: Blend shapes, morph targets with Three.js / Stickman Ventures</title>
+<meta charset=utf-8>
+<meta name=description content="Simple facial rigging utilizing morph targets powered by three.js in WebGL.">
+<meta name=author content="Team Stickman">
+<link href="css/index.css" type="text/css" rel=Stylesheet />
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/pepper-grinder/jquery-ui.css" type="text/css" rel=Stylesheet />
+</head>
+<body>
+<fieldset id=ctrl>
+  <a href="#" id=reset-blend-targets class=button>Reset Blend Targets</a>
+  <a href="#" id=toggle-mouse-tracking class=button>Mouse tracking <span class=state id=toggle-mouse-tracking-state>ON</span></a>
+<div class=sliderControl>
+  <label for=blendJawRange>Jaw Range</label>
+  <div id=blendJawRange></div>
+</div>
+<div class=sliderControl>
+  <label for=blendSyncRange>Lip Sync</label>
+  <div id=blendSyncRange></div>
+</div>
+<div class=sliderControl>
+  <label for=blendTwistRange>Jaw Twist</label>
+  <div id=blendTwistRange></div>
+</div>
+<div class=sliderControl>
+  <label for=blendLipRange>Lip Curl</label>
+  <div id=blendLipRange></div>
+</div>
+<div class=sliderControl>
+  <label for=blendBlinkRange>Eyes</label>
+  <div id=blendBlinkRange></div>
+</div>
+<div class=sliderControl>
+  <label for=blendWidthRange>Width</label>
+  <div id=blendWidthRange></div>
+</div>
+<div class=sliderControl>
+  <label for=blendExpressRange>Expression</label>
+  <div id=blendExpressRange></div>
+</div>
+<div class=sliderControl>
+  <label for=blendSymRange>Symmetry</label>
+  <div id=blendSymRange></div>
+</div>
+<div class=sliderControl>
+  <label for=blendTongueRange>Tongue</label>
+  <div id=blendTongueRange></div>
+</div>
+<div class=sliderControl>
+  <label for=blendMaleRange>Sex</label>
+  <div id=blendMaleRange></div>
+</div>
+</fieldset>
+<div id=loading>
+  <h3>Please wait while I load the model...</h3>
+  <div id=whatsloaded></div>
+</div>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+<script type="text/javascript" src="js/three.js"></script>
+<script type="text/javascript" src="js/three-shadows.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
+
+</body>
+</html>

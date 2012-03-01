@@ -4,6 +4,25 @@
   left: 0;
   right: 0;
 }
+#profile-image {
+  position: relative;
+}
+#profile-image img {
+  position: absolute;
+  top: -5px;
+  left: -30px;
+}
+#fb-login {
+  margin-top: 5px;
+}
+.login_btn {
+  position: relative;
+}
+.login_btn img {
+  position: absolute;
+  top: -2px;
+  left: -90px;
+}
 #content-wrap {
   margin-top: 50px;
 }

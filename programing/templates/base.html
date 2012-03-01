@@ -15,7 +15,7 @@
   <script src="/static/js/bootstrap-popover.js"></script>
   <link href="/static/css/bootstrap.css" rel="stylesheet">
   <link href="/static/css/bootstrap-responsive.css" rel="stylesheet">
-  <link href="css/index.css" rel="stylesheet">
+  <link href="static/css/index.css" rel="stylesheet">
 </head>
 <body>
 
@@ -30,6 +30,7 @@
           <li class="post"><a href="#post">post question</a></li>
         </ul>
         <p class="navbar-text pull-right" id="header-right">
+          {% block header %}{% endblock %}
         </p>
       </div>
     </div>
@@ -54,18 +55,6 @@
     <a href="#" class="btn closefun">Close</a>
   </div>
 </div>
-
-<script id="header-login-content-template" type="text/template">
-<a href="#">username</a>
-</script>
-
-<script id="header-content-template" type="text/template">
-<a href="/programing/" class="login_btn">
-  <img src="/static/img/icon_facebook_login.png"/>
-</a>
-<a href="#">produced by rei</a>
-</div>
-</script>
 
 <script id="top-content-template" type="text/template">
 <div id="top-question-content"></div>
@@ -230,22 +219,33 @@ b = 2;</script>
 
 <script src="/static/js/ace-uncompressed.js" charset="utf-8" type="text/javascript"></script>
 <script src="/static/js/mode-javascript.js" charset="utf-8" type="text/javascript"></script>
-<script src="js/index.js"></script>
+<script src="static/js/index.js"></script>
     <div id="fb-root"></div>
     <script>
       window.fbAsyncInit = function() {
-        FB.init({appId: '{{ facebook_app_id }}', status: true, cookie: true, xfbml: true});
-        FB.Event.subscribe('{% if current_user %}auth.logout{% else %}auth.login{% endif %}', function(response) {
-          window.location.reload();
+        window.Code = window.Code?window.Code:{};
+        window.Code.FB = FB;
+        FB.init({
+          appId:'191040330938892',
+          status     : true, 
+          cookie     : true,
+          oauth      : true
         });
+        FB.getLoginStatus(function(response) {
+          if (response.status == "connected") {
+            console.log("connected");
+          }
+        });
+
       };
-      (function() {
-        var e = document.createElement('script');
-        e.type = 'text/javascript';
-        e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
-        e.async = true;
-        document.getElementById('fb-root').appendChild(e);
-      }());
+      
+      (function(d){
+      var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+      if (d.getElementById(id)) {return;}
+      js = d.createElement('script'); js.id = id; js.async = true;
+      js.src = "//connect.facebook.net/en_US/all.js";
+      ref.parentNode.insertBefore(js, ref);
+      }(document));
     </script>
 </body>
 </html>
