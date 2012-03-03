@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+	<title>Protyping Lab Lifelog</title>
+	<meta charset="utf-8">
+  <script src="/static/js/jquery.js"></script>
+  <script src="/static/js/json2.js"></script>
+  <script src="/static/js/underscore.js"></script>
+  <script src="/static/js/autoresize.jquery.js"></script>
+  <script src="/static/js/backbone.js"></script>
+  <script src="/static/js/backbone-localstorage.js"></script>
+  <link href="css/v1.css" rel="stylesheet">
+</head>
+<body>
+
+<div id="content-wrap">
+  <div id="content" class="container-fluid">
+  </div>
+</div>
+
+<script type="template/text" id="item-template">
+<div class="view">
+  <span><%=name%></span>
+</div>  
+<div class="images">
+  <img src="<%=image1%>" height="40">
+  <img src="<%=image2%>" height="40">
+  <img src="<%=image3%>" height="40">  
+</div>
+</script>
+<script type="template/text" id="item-screen-template">
+<h2><%=name%></h2>
+<div class="left">
+  <image src="<%=image1%>">
+  <div>1.<%=image1_c%></div>
+</div>
+<div class="right">
+  <div>
+    <image src="<%=image2%>">
+  </div>
+  <div>
+    <image src="<%=image3%>">
+  </div>
+  <div>2.<%=image2_c%></div>
+  <div>3.<%=image3_c%></div>
+</div>
+
+</script>
+
+<div id="theater" style="display:none;"></div>
+<div id="screen" style="display:none;"></div>
+<script src="js/v1.js"></script>
+
+</body>
+</html>

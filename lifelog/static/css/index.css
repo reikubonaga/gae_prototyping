@@ -1,0 +1,41 @@
+body {
+  background: #ececec;
+  margin: 0px;
+}
+.item {
+  position: absolute;
+}
+#theater {
+  position: absolute;
+  background: #000;
+  opacity: 0.7;
+  height: 100%;
+  width: 100%;
+  z-index: 10;
+}
+#screen {
+  position: absolute;
+  top: 100px;
+  left: 15%;
+  width: 70%;
+  background: #fff;
+  z-index: 20;
+}
+#screen .left {
+  width: 70%;
+  position: relative;
+  float: left;
+}
+#screen .left img {
+  width: 100%;
+  z-index: 50;
+}
+#screen .right {
+  position: relative;
+  float: left;
+  width: 30%;
+}
+#screen .right img {
+  width: 100%;
+  z-index: 50;
+}
