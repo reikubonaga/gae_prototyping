@@ -19,10 +19,10 @@ class Lifelog.ItemView extends Backbone.View
   template_screen:(model)->
     _.template($("#item-screen-template").html(),model)
   events:
-    "click .images":"screen"
-  screen:()->
-    console.log "click"
+    "click .images img":"screen"
+  screen:(event)->
     el = @make("div",{"class":"screen"})
+    target_el = event.currentTarget
     @screen = el
     $(el).html @template_screen @model
     $("#theater").show().click(->
@@ -30,6 +30,7 @@ class Lifelog.ItemView extends Backbone.View
       $("#screen").html("").hide()
     )
     $("#screen").append(el).show()
+    Lifelog.indexView.render_back @model["image"+$(target_el).attr("num")]
   render:(model)->
     @model = model
     el = @make("div",{"class":"item"})
@@ -68,6 +69,10 @@ class Lifelog.IndexView extends Backbone.View
     for data in @datas
       itemView = new Lifelog.ItemView
       @$el.append itemView.render data
+    @render_back @datas[0].image2
+  render_back:(image)->
+    width = $(window).width()
+    $("#background img").attr("src",image).css("width",width+"px")
 
-indexView = new Lifelog.IndexView
-indexView.render()
+Lifelog.indexView = new Lifelog.IndexView
+Lifelog.indexView.render()

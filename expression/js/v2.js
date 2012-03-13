@@ -427,33 +427,18 @@ var nextBlinkTime = 0;
 var nowBlink = 50;
 var canRendering = false;
 var blinkNum = 0;
-
-var smileWidth = 80;
-var smileExpression = 75;
-var nowWidth = 50;
-var nowExpression = 50;
-var date = new Date();
-var nowTime = date.getTime();
-var closeSmileTime = 0;
-var nextSmileTime = nowTime+4000;
-var smile = 1;
-
 function loop(){
     
     if(renderReady==8){
-        eyemove(0.03064066852367686,-0.22222222222222232);
         canRendering = true;
     }
     if(canRendering){
-        var date = new Date();
-        var nowTime = date.getTime();
-        //瞬き        
         if(nowBlink>50){
             nowBlink -= 7;
             blendBlink(nowBlink);
         }else{
-
-            if(nextBlinkTime<nowTime){
+            var date = new Date();
+            if(nextBlinkTime<date.getTime()){
                 blinkNum++;
                 blendBlink(100);
                 nowBlink = 100;
@@ -466,40 +451,8 @@ function loop(){
                 }
             }
         }
-        
-        if(closeSmileTime < nowTime){
-            if(nowWidth>50){
-                nowWidth -= 1;
-                blendWidth(nowWidth);
-            }
-            if(nowExpression>50){
-                nowExpression -= 1;
-                blendExpress(nowExpression);
-            }
-        }else{
-            if(nowExpression<smileExpression){
-                nowWidth += 0.5;
-                blendWidth(nowWidth);                
-            }
-            if(nowExpression<smileExpression){
-                nowExpression += 0.5;
-                blendExpress(nowExpression);                
-            }
-        }
-        if(nextSmileTime<nowTime){
-            closeSmileTime = nowTime+4000+Math.floor(Math.random()*3)*1000;
-            nextSmileTime = nowTime+10000+Math.floor(Math.random()*10)*1000;
-        }
     }
     render();
-}
-function eyemove(x,y){
-    groupLeye.rotation.y=(x*1)/2;
-    groupReye.rotation.y=(x*1)/2;
-    groupLeye.rotation.x=-y/2;
-    groupReye.rotation.x=-y/2;
-    groupHead.rotation.y=x/8;
-    groupHead.rotation.x=-y/8;
 }
 function render(){
     if(resettoCenterCheck==true){

@@ -446,6 +446,10 @@ function onDocumentMouseMove(event){
         mesh.morphTargetInfluences[5]=mouse.x*2.5;
         mesh.morphTargetInfluences[6]=(mouse.y*2.5)*eyelock;
         mesh.morphTargetInfluences[7]=-(mouse.y*2.5)*eyelock;
+        console.log("start");
+        console.log(mouse.x);
+        console.log(mouse.y);
+
         groupLeye.rotation.y=(mouse.x*1)/2;
         groupReye.rotation.y=(mouse.x*1)/2;
         groupLeye.rotation.x=-mouse.y/2;

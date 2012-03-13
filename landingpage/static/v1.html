@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+	<title>Protyping Lab Landing Page</title>
+	<meta charset="utf-8">
+  <script src="/static/js/jquery.js"></script>
+  <link href="css/index.css" rel="stylesheet">
+  <script src="js/index.js"></script>
+</head>
+<body>
+<div id="content" style="width:980px;">
+  <div id="text0"></div>
+  <div id="text0_1"></div>
+  <div id="move1">
+    <img src="img/onepeace_1.png"></img>
+  </div>
+  <div id="text1"></div>
+  <div id="move2">
+    <img src="img/onepeace_2.png"></img>
+  </div>
+  <div id="text2"></div>
+  <div id="move3">
+    <img src="img/onepeace_3.png"></img>
+  </div>
+  <div id="text3"></div>
+  <div id="move4">
+    <img src="img/onepeace_4.png"></img>
+  </div>
+  <div id="text4"></div>
+  <div id="move5">
+    <img src="img/onepeace_5.png"></img>
+  </div>
+  <div id="text5"></div>
+  <div id="move6">
+    <img src="img/onepeace_6.png"></img>
+  </div>
+  <div id="text6"></div>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){
+  landing = new Landing();
+  landing.setSleep(500);
+  landing.setMoveElement($("#text0"));
+  landing.setShowText("ワンピースの歴史について",$("#text0"));
+  landing.setShowText("全64巻、636章、13572ページ、11映画、31ゲーム",$("#text0_1"));
+  landing.setMoveElement($("#move1"));
+  landing.setMoveElement($("#text1"));
+  landing.setShowText("2011年の売り上げ37,996,373部。２位との差は圧倒的!!",$("#text1"));
+  landing.setMoveElement($("#move2"));
+  landing.setMoveElement($("#text2"));
+  landing.setShowText("7年目にして36巻目で、累計１億冊を突破",$("#text2"));
+  landing.setMoveElement($("#move3"));
+  landing.setMoveElement($("#text3"));
+  landing.setShowText("年間漫画セールスランキング2005年と2006年を除いてナンバーワン",$("#text3"));
+  landing.setMoveElement($("#move4"));
+  landing.setMoveElement($("#text4"));
+  landing.setShowText("カバーランキングは、ルフィが１位、２がゾロ",$("#text4"));
+  landing.setMoveElement($("#move5"));
+  landing.setMoveElement($("#text5"));
+  landing.setShowText("漫画愛読者からは絶大な人気を誇っている",$("#text5"));
+  landing.setMoveElement($("#move6"));
+  landing.setMoveElement($("#text6"));
+  landing.start();
+});
+</script>
+</body>
+</html>
