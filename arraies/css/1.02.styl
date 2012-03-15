@@ -62,6 +62,13 @@ body
 #header h1#logo a:hover span
   opacity 0.8
 
+#header-main
+  position fixed
+  top gn(7)+gn(13)
+  left 0px
+  z-index 999
+  box-shadow 0 0px #ddd
+
 #header-menu-wrap
   position fixed
   top gn(7)
@@ -69,7 +76,6 @@ body
   z-index 999
   box-shadow 0 0px #ddd
   width:100%
-  background white
 
 #header-menu
   width:90%
@@ -78,7 +84,7 @@ body
   margin-left:5%
   margin-right:auto
   height:gn(8)
-  position relative
+  position:relative
 
 #header-menu ul
   position absolute
@@ -101,6 +107,23 @@ body
 
 #header-menu li img
   height 25px
+
+#menu-main li
+  display inline-block
+  *display inline
+  *zoom 1
+  padding gn(13) gn(10)
+
+#menu-main li a
+  color #5b5b5b
+
+#menu-main li a:hover
+  color #333
+
+#menu-main li.current a
+  color #2b2b2b !important
+  font-weight bold
+  text-decoration none
 
 #menu-sub
   float right

@@ -19,9 +19,9 @@
 
     Mosaic.prototype.width = 980;
 
-    Mosaic.prototype.space_width = 60;
+    Mosaic.prototype.space_width = 24;
 
-    Mosaic.prototype.space_height = 112;
+    Mosaic.prototype.space_height = 36;
 
     function Mosaic() {
       var num;

@@ -11,8 +11,8 @@ class Mosaic
   render_left:[]
   data_width:226
   width:980
-  space_width:60
-  space_height:112
+  space_width:24
+  space_height:36
   #width_num
   #collection
 
