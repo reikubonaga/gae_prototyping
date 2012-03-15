@@ -17,17 +17,27 @@ handlers:
 - url: /expression
   static_dir: expression
 
+- url: /arraies
+  static_dir: arraies
+
 - url: /programing/static
   static_dir: programing/static
 
 - url: /programing.*
   script: programing/programing.py
 
+- url: /name/static
+  static_dir: name/static
+
+- url: /name.*
+  script: name/name.py
+
 - url: /lifelog/static
   static_dir: lifelog/static
 
 - url: /math/static
   static_dir: math/static
+
 
 - url: /landingpage/static
   static_dir: landingpage/static
