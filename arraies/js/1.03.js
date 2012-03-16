@@ -121,15 +121,6 @@
       return _results;
     };
 
-    Mosaic.prototype.need_data_space = 3000;
-
-    Mosaic.prototype.need_data = function(scrollTop) {
-      var top;
-      top = _.max(this.render_top);
-      if (scrollTop + this.need_data_space > top) return true;
-      return false;
-    };
-
     return Mosaic;
 
   })();
@@ -146,7 +137,7 @@
 
     ImpactMosaic.prototype.equal_index = false;
 
-    ImpactMosaic.prototype.equal_space = 20;
+    ImpactMosaic.prototype.equal_space = 6;
 
     ImpactMosaic.prototype.before_top = -1;
 
@@ -238,18 +229,8 @@
     };
 
     View_Project.prototype.render = function(model_json) {
-      var div, img;
+      var div;
       div = this.make("div");
-      img = this.make("img");
-      $(img).hide().attr("src", model_json.image_host + model_json.user_id + "/" + model_json.id + "/bigger_" + model_json.image_url).css({
-        height: model_json.img_hegiht + "px",
-        width: model_json.img_width + "px"
-      }).load(function() {
-        $(".thumbnail", div).append(img);
-        return $(img).fadeIn("slow");
-      }).error(function() {
-        return console.log("error");
-      });
       return $(div).html(this.template(model_json));
     };
 
@@ -272,10 +253,7 @@
       self = this;
       return model_Projects.fetch({
         success: function(collection) {
-          var arr;
-          arr = collection.toJSON();
-          arr = _.shuffle(arr);
-          mosaic.add(arr);
+          mosaic.add(collection.toJSON());
           mosaic.calculate();
           return self.render_projects(100);
         }
@@ -304,11 +282,7 @@
     var view;
     window.mosaic = new ImpactMosaic(model_Projects);
     view = new View_Projects;
-    view.render();
-    return $(window).scroll(function() {
-      console.log(this.scrollY);
-      if (window.mosaic.need_data(this.scrollY)) return view.render();
-    });
+    return view.render();
   });
 
 }).call(this);

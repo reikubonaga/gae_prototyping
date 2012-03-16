@@ -73,13 +73,20 @@ class Mosaic
     @render_left.push @surplus_width/2
     for i in [1..@width_num-1]
       @render_left.push (@render_left[i-1]+@space_width+@data_width)
+  need_data_space:3000
+  need_data:(scrollTop)->
+    top = _.max @render_top
+    if scrollTop + @need_data_space > top
+      return true
+    return false
+
 
 class ImpactMosaic extends Mosaic
   constructor: (@collection) ->
     @width = $(window).width()
     super()
   equal_index:false
-  equal_space:6
+  equal_space:20
   before_top:-1
   before_left_index:-1
   equal_top:()->
@@ -131,7 +138,19 @@ class View_Project extends Backbone.View
     _.template($("#project_template").html(),model_json)
   render:(model_json)->
     div = @make "div"
+    img = @make "img"
+    $(img)
+      .hide()
+      .attr("src",model_json.image_host+model_json.user_id+"/"+model_json.id+"/bigger_"+model_json.image_url)
+      .css({height:model_json.img_hegiht+"px",width:model_json.img_width+"px"})
+      .load(->
+        $(".thumbnail",div).append img
+        $(img).fadeIn("slow")
+      ).error(->
+        console.log "error"
+      )
     $(div).html @template(model_json)
+
 
 class View_Projects extends Backbone.View
   el:"#content"
@@ -139,7 +158,9 @@ class View_Projects extends Backbone.View
     self = @
     model_Projects.fetch(
       success:(collection)->
-        mosaic.add collection.toJSON()
+        arr = collection.toJSON()
+        arr = _.shuffle(arr)
+        mosaic.add arr
         mosaic.calculate()
         self.render_projects(100)
     )
@@ -157,3 +178,7 @@ $ ->
   view = new View_Projects
   view.render()
 
+  $(window).scroll ->
+    console.log @scrollY
+    if window.mosaic.need_data(@scrollY)
+      view.render()

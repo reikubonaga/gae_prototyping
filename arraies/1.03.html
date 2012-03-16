@@ -1,6 +1,6 @@
 <html>
   <head>
-    <link href="css/index.css" rel="stylesheet">
+    <link href="css/1.03.css" rel="stylesheet">
 	  <meta charset="utf-8">
     <script src="/static/js/jquery.js"></script>
     <script src="/static/js/json2.js"></script>
@@ -60,20 +60,20 @@
       <div id="content">
       </div>
     </div>
-<script id="project_template" type="text/template">
-<div class="project" style="top:<%=top%>px;left:<%=left%>px;">
-  <div class="thumbnail-wrap" style="height:<%=img_height%>px;width:<%=img_width%>px;">
-    <div class="thumbnail">
-    </div>
-  </div>
-  <div class="title-wrap">
-    <div id="title">
-      <a href=""><%=name%></a> by <a href=""><%=username%></a>
-    </div>
-  </div>
-</div>
-</script>
-    <script src="js/index.js"></script>
+    <script id="project_template" type="text/template">
+      <div class="project" style="top:<%=top%>px;left:<%=left%>px;">
+        <div class="thumbnail-wrap">
+          <div class="thumbnail">
+            <img src="<%=image_host%><%=user_id%>/<%=id%>/bigger_<%=image_url%>" style="hegiht:<%=img_height%>px;width:<%=img_width%>px;"></img>
+          </div>
+        </div>
+        <div class="title-wrap">
+          <div id="title">
+            <a href=""><%=name%></a> by <a href=""><%=username%></a>
+          </div>
+        </div>
+      </div>
+    </script>
+    <script src="js/1.03.js"></script>
   </body>
 </html>
-]

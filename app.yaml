@@ -32,6 +32,10 @@ handlers:
 - url: /name.*
   script: name/name.py
 
+- url: /_ah/mail/.+
+  script: mailtest/mailtest.py
+  login: admin
+
 - url: /lifelog/static
   static_dir: lifelog/static
 
@@ -47,3 +51,6 @@ handlers:
 
 - url: .*
   script: main.py
+
+inbound_services:
+- mail
