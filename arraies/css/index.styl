@@ -24,15 +24,20 @@ body
   color #333
   word-wrap break-word
 
+#header-group
+  height gn(8)+gn(7)
+  position fixed
+  z-index 999
+  top 0px
+  left 0px
+  width 100%
+
 #header
   width 90%
 #header-main
   width 90%
 
 #header-wrap
-  position fixed
-  top 0px
-  left 0px
   background-color #E6E6E6
   z-index 1000
   border-bottom-image url(../img/border.png)
@@ -63,20 +68,19 @@ body
   opacity 0.8
 
 #header-menu-wrap
-  position fixed
-  top gn(7)
-  left 0px
-  z-index 999
+  z-index 1000
   box-shadow 0 0px #ddd
   width:100%
   background white
+  opacity(0.9)
+  padding-top:gn(9)
+  padding-bottom:gn(9)
+  padding-left:5%
+  padding-right:5%
+    
 
 #header-menu
   width:90%
-  margin-top:gn(9)
-  margin-bottom:gn(9)
-  margin-left:5%
-  margin-right:auto
   height:gn(8)
   position relative
 
@@ -150,6 +154,7 @@ body
   -moz-box-shadow 5px 5px 1px #9E9E9C,-1px -1px 3px #9E9E9C
   -webkit-box-shadow 5px 5px 1px #9E9E9C,-1px -1px 3px #9E9E9C
   position relative
+
 .project .title-wrap
   margin-top 5px
   margin-left 7px

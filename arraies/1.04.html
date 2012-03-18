@@ -1,0 +1,79 @@
+<html>
+  <head>
+    <link href="css/1.04.css" rel="stylesheet">
+	  <meta charset="utf-8">
+    <script src="/static/js/jquery.js"></script>
+    <script src="/static/js/json2.js"></script>
+    <script src="/static/js/underscore.js"></script>
+    <script src="/static/js/autoresize.jquery.js"></script>
+    <script src="/static/js/backbone.js"></script>
+  </head>
+  <body>
+    <div id="header-wrap">
+      <div id="header" class="container clearfix">
+        <h1 id="logo">
+          <img src="/arraies/img/logo.png"></img>
+        </h1>
+        <ul id="menu-sub">
+          <li class="c last">
+            <a class="overlay" href="/login">
+              Log In
+            </a>
+        </ul>
+      </div>
+    </div>
+    <div id="header-menu-wrap">
+      <div id="header-menu" class="container clearfix">
+        <div class="modal"></div>
+        <ul id="header-menu-left">
+          <li class="projects icon">
+            <a href="/">
+              <img src="img/projects_big.png"></img>
+            </a>
+          </li>
+          <li class="people icon">
+            <a href="/">
+              <img src="img/people_big.png"></img>
+            </a>
+          </li>
+          <li class="popular">
+            <a href="/">
+              Popular
+            </a>
+          </li>
+          <li class="popular">
+            <a href="/">
+              New
+            </a>
+          </li>
+        </ul>
+        <ul id="header-menu-right">
+          <li>
+            <a>
+              <img src="img/random_big.png"></img>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div id="content-wrap">
+      <div id="content">
+      </div>
+    </div>
+<script id="project_template" type="text/template">
+<div class="project" style="top:<%=top%>px;left:<%=left%>px;">
+  <div class="thumbnail-wrap" style="height:<%=img_height%>px;width:<%=img_width%>px;">
+    <div class="thumbnail">
+    </div>
+  </div>
+  <div class="title-wrap">
+    <div id="title">
+      <a href=""><%=name%></a> by <a href=""><%=username%></a>
+    </div>
+  </div>
+</div>
+</script>
+    <script src="js/1.04.js"></script>
+  </body>
+</html>
+]

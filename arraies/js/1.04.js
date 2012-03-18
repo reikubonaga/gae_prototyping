@@ -125,7 +125,7 @@
 
     Mosaic.prototype.need_data = function(scrollTop) {
       var top;
-      top = _.min(this.render_top);
+      top = _.max(this.render_top);
       if (scrollTop + this.need_data_space > top) return true;
       return false;
     };
@@ -301,44 +301,13 @@
   })(Backbone.View);
 
   $(function() {
-    var lock, next_scrollY, scroll_up, view, y_arr;
+    var view;
     window.mosaic = new ImpactMosaic(model_Projects);
     view = new View_Projects;
     view.render();
-    next_scrollY = 300;
-    scroll_up = true;
-    lock = false;
-    $(window).scroll(function() {
-      if (window.mosaic.need_data(this.scrollY)) view.render();
-      if (lock) return;
-      if (this.scrollY > next_scrollY && scroll_up) {
-        lock = true;
-        $("#header-group").slideUp("slow", function() {
-          scroll_up = false;
-          return lock = false;
-        });
-      }
-      if (!scroll_up && this.scrollY < 200) {
-        lock = true;
-        return $("#header-group").slideDown("normal", function() {
-          next_scrollY = $(window)[0].scrollY + 100;
-          scroll_up = true;
-          return lock = false;
-        });
-      }
-    });
-    y_arr = [];
-    lock = false;
-    return $(window).mousemove(function(event) {
-      if (lock) return;
-      if (event.clientY < 200 && !scroll_up) {
-        lock = true;
-        return $("#header-group").slideDown("normal", function() {
-          lock = false;
-          next_scrollY = $(window)[0].scrollY + 100;
-          return scroll_up = true;
-        });
-      }
+    return $(window).scroll(function() {
+      console.log(this.scrollY);
+      if (window.mosaic.need_data(this.scrollY)) return view.render();
     });
   });
 

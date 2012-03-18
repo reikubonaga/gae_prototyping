@@ -73,10 +73,9 @@ class Mosaic
     @render_left.push @surplus_width/2
     for i in [1..@width_num-1]
       @render_left.push (@render_left[i-1]+@space_width+@data_width)
-  #次に読み込む判定
   need_data_space:3000
   need_data:(scrollTop)->
-    top = _.min @render_top
+    top = _.max @render_top
     if scrollTop + @need_data_space > top
       return true
     return false
@@ -179,39 +178,7 @@ $ ->
   view = new View_Projects
   view.render()
 
-  next_scrollY = 300
-  scroll_up = true
-  lock = false
   $(window).scroll ->
+    console.log @scrollY
     if window.mosaic.need_data(@scrollY)
       view.render()
-    if lock
-      return
-    if @scrollY > next_scrollY and scroll_up
-      lock = true
-      $("#header-group").slideUp("slow",->
-        scroll_up = false
-        lock = false
-      )
-    if not scroll_up and @scrollY<200
-      lock = true
-      $("#header-group").slideDown("normal",->
-        next_scrollY = $(window)[0].scrollY+100
-        scroll_up = true
-        lock = false
-      )
-  y_arr = []
-  lock = false
-
-  $(window).mousemove (event)->
-    if lock
-      return
-    if event.clientY < 200 and not scroll_up
-      lock = true
-      $("#header-group").slideDown("normal",->
-        lock = false
-        next_scrollY = $(window)[0].scrollY+100
-        scroll_up = true
-      )
-
-
