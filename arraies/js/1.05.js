@@ -1,5 +1,5 @@
 (function() {
-  var CanDetailMosaic, ImpactMosaic, Model_Project, Model_Projects, Mosaic, View_Project, View_Projects, model_Projects,
+  var ImpactMosaic, Model_Project, Model_Projects, Mosaic, View_Project, View_Projects, model_Projects,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
@@ -191,18 +191,6 @@
 
   })(Mosaic);
 
-  CanDetailMosaic = (function(_super) {
-
-    __extends(CanDetailMosaic, _super);
-
-    function CanDetailMosaic() {
-      CanDetailMosaic.__super__.constructor.apply(this, arguments);
-    }
-
-    return CanDetailMosaic;
-
-  })(ImpactMosaic);
-
   Model_Project = (function(_super) {
 
     __extends(Model_Project, _super);
@@ -332,7 +320,7 @@
       }
       if (!scroll_up && this.scrollY < 200) {
         lock = true;
-        return $("#header-group").slideDown("fast", function() {
+        return $("#header-group").slideDown("normal", function() {
           next_scrollY = $(window)[0].scrollY + 100;
           scroll_up = true;
           return lock = false;
@@ -343,9 +331,9 @@
     lock = false;
     return $(window).mousemove(function(event) {
       if (lock) return;
-      if (event.clientY < 84 && !scroll_up) {
+      if (event.clientY < 200 && !scroll_up) {
         lock = true;
-        return $("#header-group").slideDown("fast", function() {
+        return $("#header-group").slideDown("normal", function() {
           lock = false;
           next_scrollY = $(window)[0].scrollY + 100;
           return scroll_up = true;

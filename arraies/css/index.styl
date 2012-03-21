@@ -2,27 +2,7 @@
 
 @import '__reset__'
 @import '__func__'
-
-a
-  //color #30a0ca
-  text-decoration none
-
-a:hover
-  color #19558d
-  //text-decoration underline
-
-li
-  list-style-type none
-  list-style-image none
-
-body
-  font-family helvetica
-  font-size 13px
-  line-height 1.618
-  font-weight normal
-  text-align left
-  color #333
-  word-wrap break-word
+@import '__global__'
 
 #header-group
   height gn(8)+gn(7)
@@ -31,38 +11,6 @@ body
   top 0px
   left 0px
   width 100%
-
-#header
-  width 90%
-#header-main
-  width 90%
-
-#header-wrap
-  background-color #E6E6E6
-  z-index 1000
-  border-bottom-image url(../img/border.png)
-  //border-top dotted 2px #868686
-  //border-bottom dotted gn(13) #868686
-  border-top dotted 2px #BDBDBD
-  border-bottom dotted gn(13) #BDBDBD
-  width 100%
-
-#header
-  //edit
-  width 90%
-  margin:auto
-  height gn(7)
-  z-index 1000
-
-#header h1#logo
-  float left
-  display inline
-  height gn(7)
-  vertical-align bottom
-
-#logo img
-  height 22px
-  margin-top gn(10)
 
 #header h1#logo a:hover span
   opacity 0.8
@@ -76,8 +24,7 @@ body
   padding-top:gn(9)
   padding-bottom:gn(9)
   padding-left:5%
-  padding-right:5%
-    
+  padding-right:5%    
 
 #header-menu
   width:90%
@@ -106,43 +53,6 @@ body
 #header-menu li img
   height 25px
 
-#menu-sub
-  float right
-
-#menu-sub li
-  float left
-  display inline
-
-#menu-sub li#is_login.last
-  position relative
-  min-width gn(4)
-
-#menu-sub li a
-  text-decoration none
-  height gn(7)
-  line-height gn(7)
-  padding 0 gn(9)
-  display block
-
-#menu-sub li a:hover
-  background #2b2b2b
-
-#menu-sub li a
-  color #000
-  text-shadow 0px -1px 0px rgba(0, 0, 0, 0.5)
-
-#menu-sub li a:hover
-  color #fff
-  text-shadow 0px 1px 0px rgba(0, 0, 0, 0.8)
-
-#menu-sub li.last a img.thumbnail
-  position relative
-  top -1px
-  height gn(7) - 2*gn(12)
-  width gn(7) - 2*gn(12)
-  padding gn(12)
-  margin-right gn(13)
-  vertical-align middle
 
 #content-wrap
   top:gn(5)

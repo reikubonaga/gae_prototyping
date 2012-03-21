@@ -42,6 +42,11 @@ handlers:
 - url: /math/static
   static_dir: math/static
 
+- url: /fbgroup
+  static_dir: fbgroup
+
+- url: /fileupload
+  static_dir: fileupload
 
 - url: /landingpage/static
   static_dir: landingpage/static

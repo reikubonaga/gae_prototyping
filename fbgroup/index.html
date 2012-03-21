@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>Protyping Lab Facebook Group</title>
+		<meta charset="utf-8">
+    <link href="/static/css/bootstrap.css" rel="stylesheet">
+    <link href="/static/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="css/index.css" rel="stylesheet">
+    </head>
+  <body>
+    <div id="header">
+      <div id="logo">Always Prototyping Facebook Groupg</div>
+      <div id="producer"><a href="http://kwl-e.com">produced by rei</a></div>
+    </div>
+    <div id="content">
+    </div>
+    <script src="/static/js/jquery.js"></script> 
+    <script src="/static/js/json2.js"></script>
+    <script src="/static/js/underscore.js"></script>
+    <script src="/static/js/backbone.js"></script>
+    <script src="js/index.js"></script>
+    <div id="fb-root"></div>
+    <script>
+      window.fbAsyncInit = function() {
+        window.Corridor = window.Corridor?window.Corridor:{};
+        window.Corridor.FB = FB;
+        FB.init({
+          appId:'191040330938892',
+          status     : true, 
+          cookie     : true, 
+          xfbml      : true 
+        });
+        FB.getLoginStatus(function(response) {
+          if (response.status == "connected") {
+            //FB.api('/me/groups',function(response){
+              //console.log(response);
+            //});
+            FB.api('/130206510419158/albums',function(response){
+              console.log(response);
+            });
+          }
+        });
+
+      };
+      
+      (function(d){
+      var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+      if (d.getElementById(id)) {return;}
+      js = d.createElement('script'); js.id = id; js.async = true;
+      js.src = "//connect.facebook.net/en_US/all.js";
+      ref.parentNode.insertBefore(js, ref);
+      }(document));
+    </script>
+  </body>
+</html>

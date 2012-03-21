@@ -124,10 +124,6 @@ class ImpactMosaic extends Mosaic
     @render_top[index] = top+h+@space_height
     return [top,@render_left[index]]
 
-class CanDetailMosaic extends ImpactMosaic
-
-
-
 class Model_Project extends Backbone.Model
   test:()->
     console.log "test"
@@ -199,7 +195,7 @@ $ ->
       )
     if not scroll_up and @scrollY<200
       lock = true
-      $("#header-group").slideDown("fast",->
+      $("#header-group").slideDown("normal",->
         next_scrollY = $(window)[0].scrollY+100
         scroll_up = true
         lock = false
@@ -210,9 +206,9 @@ $ ->
   $(window).mousemove (event)->
     if lock
       return
-    if event.clientY < 84 and not scroll_up
+    if event.clientY < 200 and not scroll_up
       lock = true
-      $("#header-group").slideDown("fast",->
+      $("#header-group").slideDown("normal",->
         lock = false
         next_scrollY = $(window)[0].scrollY+100
         scroll_up = true

@@ -154,77 +154,10 @@ body {
   margin-right: 2px;
   vertical-align: middle;
 }
-#header-group {
-  height: 54px;
-  position: fixed;
-  z-index: 999;
-  top: 0px;
-  left: 0px;
-  width: 100%;
+#header {
+  width: 1024px;
 }
-#header h1#logo a:hover span {
-  opacity: 0.8;
-  -moz-opacity: 0.8;
-  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80);
-}
-#header-menu-wrap {
-  z-index: 1000;
-  -webkit-box-shadow: 0 0px #ddd;
-  -moz-box-shadow: 0 0px #ddd;
-  -ms-box-shadow: 0 0px #ddd;
-  -o-box-shadow: 0 0px #ddd;
-  -box-shadow: 0 0px #ddd;
-  width: 100%;
-  background: #fff;
-  opacity: 0.9;
-  -moz-opacity: 0.9;
-  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=90);
-  padding-top: 13px;
-  padding-bottom: 13px;
-  padding-left: 5%;
-  padding-right: 5%;
-}
-#header-menu {
-  width: 90%;
-  height: 21px;
-  position: relative;
-}
-#header-menu ul {
-  position: absolute;
-}
-#header-menu-left {
-  left: 0px;
-}
-#header-menu-right {
-  right: 0px;
-}
-#header-menu li {
-  display: inline-block;
-  *display: inline;
-  *zoom: 1;
-  height: 21px;
-  padding-left: 16px;
-}
-#header-menu li.icon {
-  padding-left: 5px;
-}
-#header-menu li img {
-  height: 25px;
-}
-#content-wrap {
-  top: 87px;
-  position: absolute;
-}
-.project {
-  position: absolute;
-}
-.project .thumbnail-wrap {
-  -moz-box-shadow: 5px 5px 1px #9e9e9c, -1px -1px 3px #9e9e9c;
-  -webkit-box-shadow: 5px 5px 1px #9e9e9c, -1px -1px 3px #9e9e9c;
-  position: relative;
-}
-.project .title-wrap {
-  margin-top: 5px;
-  margin-left: 7px;
-  font-family: 'ヒラギノ角ゴ Pro W3', 'Hiragino Kaku Gothic Pro', 'メイリオ', Meiryo, 'ＭＳ Ｐゴシック', sans-serif;
+#content {
+  width: 1024px;
+  margin: auto;
 }
