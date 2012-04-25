@@ -1,0 +1,156 @@
+.clearfix:after
+  content "\0020"
+  display block
+  height 0
+  clear both
+  overflow hidden
+  visibility hidden
+  
+.clearfix 
+  display inline-table
+
+gn(n, r=0) // golden-num
+  if n==0
+    970+r px
+  else if n==1
+    600+r px
+  else if n==2
+    370+r px
+  else if n==3
+    230+r px
+  else if n==4
+    141+r px
+  else if n==5
+    87+r px
+  else if n==6
+    54+r px
+  else if n==7
+    33+r px
+  else if n==8
+    21+r px
+  else if n==9
+    13+r px
+  else if n==10
+    8+r px
+  else if n==11
+    5+r px
+  else if n==12
+    3+r px
+  else if n==13
+    2+r px
+  else if n==14
+    1+r px
+  else
+    0 px
+
+add(a, b)
+  a + b
+
+subtract(a,b)
+  a - b
+
+
+opacity(n)
+  opacity n
+  -moz-opacity n
+  filter unquote('progid:DXImageTransform.Microsoft.Alpha(Opacity=' + round(n * 100) + ')')
+
+border-radius()
+  -webkit-border-radius arguments
+  -moz-border-radius arguments
+  -ms-border-radius arguments
+  -o-border-radius arguments
+  border-radius arguments
+
+box-shadow()
+  -webkit-box-shadow arguments
+  -moz-box-shadow arguments
+  -ms-box-shadow arguments
+  -o-box-shadow arguments
+  -box-shadow arguments
+
+box-sizing()
+  -webkit-box-sizing arguments
+  -moz-box-sizing arguments
+  -ms-box-sizing arguments
+  -o-box-sizing arguments
+  box-sizing arguments
+
+transform()
+  -webkit-transform arguments
+  -moz-transform arguments
+  -ms-transform arguments
+  -o-transform arguments
+  transform arguments
+
+transition()
+  -webkit-transition arguments
+  -moz-transition arguments
+  -ms-transition arguments
+  -o-transition arguments
+  transition arguments
+
+transition-property()
+  -webkit-transition-property arguments
+  -moz-transition-property arguments
+  -ms-transition-property arguments
+  -o-transition-property arguments
+  transition-property arguments
+
+transition-duration()
+  -webkit-transition-duration arguments
+  -moz-transition-duration arguments
+  -ms-transition-duration arguments
+  -o-transition-duration arguments
+  transition-duration arguments
+
+
+
+// icon-sprite background
+icon-sprite(t=0,l=0)
+  // background-image
+  background-repeat no-repeat
+  background-position l t
+  display inline-block
+  *display inline
+  *zoom 1
+
+// gradient template
+
+// dff0b1 c3dd82 87c442 5bc73e
+gradient-green(f=#dff0b1, t=#c3dd82, n=0.72) // from , to, num
+  background t
+  background -moz-linear-gradient(top, f, t n*100%, t)
+  background -webkit-gradient(linear, left top, left bottom, from(f), color-stop(n, t), to(t))
+  background -o-linear-gradient(top, f, t n*100%, t)
+  background -ms-linear-gradient(top, f, t n*100%, t)
+  background linear-gradient(top, f, t n*100%, t)
+
+
+// 55a4f2 19558d 6d84b4 057ed0 75adfc 2a5bb3 4085ec
+gradient-blue(f=#75adfc, t=#4085ec, n=0.72) // from , to, num
+  background t
+  background -moz-linear-gradient(top, f, t n*100%, t)
+  background -webkit-gradient(linear, left top, left bottom, from(f), color-stop(n, t), to(t))
+  background -o-linear-gradient(top, f, t n*100%, t)
+  background -ms-linear-gradient(top, f, t n*100%, t)
+  background linear-gradient(top, f, t n*100%, t)
+
+
+gradient-gray(f=#fcfcfc, t=#d8d8d8, n=0.72) // from , to, num
+  background t
+  background -moz-linear-gradient(top, f, t n*100%, t)
+  background -webkit-gradient(linear, left top, left bottom, from(f), color-stop(n, t), to(t))
+  background -o-linear-gradient(top, f, t n*100%, t)
+  background -ms-linear-gradient(top, f, t n*100%, t)
+  background linear-gradient(top, f, t n*100%, t)
+
+
+gradient-red(f=#e95164, t=#d53739, n=0.72)
+  background t
+  background -moz-linear-gradient(top, f, t n*100%, t)
+  background -webkit-gradient(linear, left top, left bottom, from(f), color-stop(n, t), to(t))
+  background -o-linear-gradient(top, f, t n*100%, t)
+  background -ms-linear-gradient(top, f, t n*100%, t)
+  background linear-gradient(top, f, t n*100%, t)
+  

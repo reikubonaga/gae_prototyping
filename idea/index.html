@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+<head>
+	<title>Protyping Lab Idea</title>
+	<meta charset="utf-8">
+  <script src="/static/js/jquery.js"></script>
+  <script src="/static/js/json2.js"></script>
+  <script src="/static/js/underscore.js"></script>
+  <script src="/static/js/underscore-keys.js"></script>
+  <script src="/static/js/autoresize.jquery.js"></script>
+  <script src="/static/js/backbone.js"></script>
+  <script src="/static/js/backbone-localstorage.js"></script>
+  <script src="/static/js/backbone.shortcuts.js"></script>
+  <link href="css/index.css" rel="stylesheet">
+</head>
+<body>
+<div id="header-wrap">
+  <div id="header">
+    <div id="logo">
+      <a href="">Idea Note</a>
+    </div>
+    <div class="menu">
+      <ul>
+        <li class="new">
+          New
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content-wrap">
+  <div id="content-left-wrap">
+    <div class="title"></div>
+    <div class="ans ans1"></div>
+    <div class="ans ans2"></div>
+    <div class="ans ans3"></div>
+    <textarea tabindex="1"></textarea>
+    <div class="foot">
+      <span class="delete button">delete</span>
+      <span class="save button">save</span>
+    </div>
+  </div>
+  <div id="content-right-wrap">
+    <div id="search_bar">
+      <input type="text" tabindex="2">
+      <span class="button search">search</span>
+      <span class="button new">new</span>
+    </div>
+    <div id="search_list"></div>
+  </div>
+  <div class="clearfix"></div>
+</div>
+<script id="data_template" type="template/text">
+<div class="title">
+  <span class="edit"><%=title%></span>
+  <!--<span class="show button">show</span>-->
+  <span class="paste button">paste</span>
+</div>
+<div class="ans ans1 word"><%=ans1?ans1:""%></div>
+<div class="ans ans2 word"><%=ans2?ans2:""%></div>
+<div class="ans ans3 word"><%=ans3?ans3:""%></div>
+<div class="ans show-list"></div>
+</script>
+<script src="js/index.js"></script>
+
+
+</body>
+</html>

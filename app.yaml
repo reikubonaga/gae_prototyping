@@ -48,6 +48,19 @@ handlers:
 - url: /fileupload
   static_dir: fileupload
 
+- url: /color
+  static_dir: color
+
+- url: /rss
+  static_dir: rss
+
+- url: /idea
+  static_dir: idea
+
+
+- url: /task/static
+  static_dir: task/static
+
 - url: /landingpage/static
   static_dir: landingpage/static
 

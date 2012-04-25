@@ -1,0 +1,140 @@
+@import 'lib/var'
+
+a
+  //color #30a0ca
+  text-decoration none
+
+a:hover
+  color #19558d
+  //text-decoration underline
+
+li
+  list-style-type none
+  list-style-image none
+
+body
+  font-family helvetica
+  font-size 13px
+  line-height 1.618
+  font-weight normal
+  text-align left
+  color #333
+  word-wrap break-word
+
+.wide-header-group
+  height header_wide_height + header_wide_search_height
+  position fixed
+  z-index 999
+  top 0px
+  left 0px
+  width 100%
+
+.header
+  padding-left 5%
+  padding-right 5%
+  .logo
+    float left
+    img
+      padding-top 4px
+      height 44px
+    a:hover
+      span
+        opacity 0.8
+  .menu-sub
+    float right
+    display none
+    li
+      float left
+      display inline
+      a
+        color #414141
+        text-decoration none
+        height header_wide_height - 4px
+        line-height header_wide_height - 4px
+        padding 4px gn(9) 0px gn(9)
+        display block
+      a:hover
+        color #090909
+    li.separate
+      padding 4px 0px
+      div
+        width 1px
+        height 40px
+        background header_dot_color
+    li.last
+      a
+        img.thumbnail
+          position relative
+          top -1px
+          height 40px
+          width 40px
+          padding 2px
+          margin-right gn(13)
+          vertical-align middle
+    li.is_login.last
+      position relative
+      min-width gn(4)
+
+
+.wide-header-wrap
+  background-color header_color
+  border-top dotted 2px header_dot_color
+  h1
+    height header_wide_height
+
+.header-wrap
+  background header_color
+  border-top none
+  
+.static-header-wrap
+  .header
+    width static_container_width
+    margin auto
+    padding-left 5%
+    padding-right 5%
+    h1
+      font-size 30px
+      text-align left
+      width 150px
+      float left
+      img
+        height 48px
+  .menu-sub
+    float right      
+
+.static-container-wrap
+  top header_static_height+20px
+  position absolute
+  width 100%
+  .container
+    width static_container_width
+    margin auto
+
+.dot
+  border-bottom-image url(../img/border.png)
+  border-bottom dotted 2px header_dot_color
+
+.border  
+  border-bottom solid 1px header_dot_color
+
+.border-right
+  border-right-image url(../img/border.png)
+  border-right dotted 2px header_dot_color
+
+.button
+  padding 2px
+  border grey 1px solid
+  color white
+  background button_background
+  text-align center
+.button:hover
+  border black 1px solid
+  cursor pointer
+.button.click
+  padding-top 3px
+  padding-bottom 1px
+.link
+  color link_color
+.link:hover
+  text-decoration underline
+  cursor pointer

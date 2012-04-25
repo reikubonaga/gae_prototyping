@@ -156,7 +156,6 @@ class View_Project extends Backbone.View
       )
     $(div).html @template(model_json)
 
-
 class View_Projects extends Backbone.View
   el:"#content"
   render:()->
