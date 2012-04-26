@@ -72,29 +72,52 @@ body
 
 #content-right-wrap
   width 45%
-  padding 30px 15px 15px 15px
-  margin-left 53%
+  padding 0px 5px 15px 15px
+  margin-left 52%
   #search_bar
+    margin-top 12px
+    padding-top 26px
     padding-bottom 20px
+    position fixed
+    background white
+    width 45%
     input
-      margin-left 2%
+      margin-left 3%
       width 60%
       height 30px
       font-size 20px
+      float left
     span
-      width 18%
+      width 50px
       background red
       color white
       padding 5px 15px
       cursor pointer
+      float left
+      display block
       margin-left 2%
+      margin-top 3px
+      text-align center
     span.new
       font-size 8px
       background grey
       padding 3px 7px
+  #search_list_input
+    position fixed
+    opacity 0
+  #search_list
+    margin-top 79px
 
 .data
   .title
+    .selecter
+      float left
+      width 3%
+      font-size 10px
+      div
+        width 50px
+        height 30px
+        padding-top 5px
     font-weight bold
     .edit
       cursor pointer
@@ -106,7 +129,7 @@ body
       margin-left 3px
       cursor pointer
   .ans
-    padding-left 20px
+    padding-left 5%
     color grey
     cursor pointer
   .show-list

@@ -163,33 +163,62 @@ body {
 }
 #content-right-wrap {
   width: 45%;
-  padding: 30px 15px 15px 15px;
-  margin-left: 53%;
+  padding: 0px 5px 15px 15px;
+  margin-left: 52%;
 }
 #content-right-wrap #search_bar {
+  margin-top: 12px;
+  padding-top: 26px;
   padding-bottom: 20px;
+  position: fixed;
+  background: #fff;
+  width: 45%;
 }
 #content-right-wrap #search_bar input {
-  margin-left: 2%;
+  margin-left: 3%;
   width: 60%;
   height: 30px;
   font-size: 20px;
+  float: left;
 }
 #content-right-wrap #search_bar span {
-  width: 18%;
+  width: 50px;
   background: #f00;
   color: #fff;
   padding: 5px 15px;
   cursor: pointer;
+  float: left;
+  display: block;
   margin-left: 2%;
+  margin-top: 3px;
+  text-align: center;
 }
 #content-right-wrap #search_bar span.new {
   font-size: 8px;
   background: #808080;
   padding: 3px 7px;
 }
+#content-right-wrap #search_list_input {
+  position: fixed;
+  opacity: 0;
+  -moz-opacity: 0;
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
+}
+#content-right-wrap #search_list {
+  margin-top: 79px;
+}
 .data .title {
   font-weight: bold;
+}
+.data .title .selecter {
+  float: left;
+  width: 3%;
+  font-size: 10px;
+}
+.data .title .selecter div {
+  width: 50px;
+  height: 30px;
+  padding-top: 5px;
 }
 .data .title .edit {
   cursor: pointer;
@@ -203,7 +232,7 @@ body {
   cursor: pointer;
 }
 .data .ans {
-  padding-left: 20px;
+  padding-left: 5%;
   color: #808080;
   cursor: pointer;
 }

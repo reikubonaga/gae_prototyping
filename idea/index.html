@@ -45,17 +45,25 @@
     <div id="search_bar">
       <input type="text" tabindex="2">
       <span class="button search">search</span>
-      <span class="button new">new</span>
     </div>
+    <div class="clearfix"></div>
+    <input id="search_list_input" tabindex="3">
+    <!--<div id="search_menu">
+      <ul>
+        <li>history</li>
+        <li></li>
+      </ul>
+    </div>-->
     <div id="search_list"></div>
   </div>
-  <div class="clearfix"></div>
 </div>
+<div class="clearfix"></div>
 <script id="data_template" type="template/text">
 <div class="title">
+  <span class="selecter"><div class="selectertext"></div></span>
   <span class="edit"><%=title%></span>
   <!--<span class="show button">show</span>-->
-  <span class="paste button">paste</span>
+  <!--<span class="paste button">paste</span>-->
 </div>
 <div class="ans ans1 word"><%=ans1?ans1:""%></div>
 <div class="ans ans2 word"><%=ans2?ans2:""%></div>

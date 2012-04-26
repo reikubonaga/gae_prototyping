@@ -118,7 +118,7 @@
         this.model.set("ans3", "");
         this.model.save();
       }
-      if (!this.model.get("title")) {
+      if (!this.model.get("title") && !this.model.get("ans1") && !this.model.get("ans2") && !this.model.get("ans3")) {
         this.model.destroy();
         return false;
       }
@@ -159,18 +159,6 @@
       return this.parent.addWord($(this.$(".title .edit")[0]).html());
     };
 
-    DataView.prototype.select = function() {
-      return $(this.$(".selectertext")[0]).html("▶");
-    };
-
-    DataView.prototype.unselect = function() {
-      return $(this.$(".selectertext")[0]).html("");
-    };
-
-    DataView.prototype.scroll = function() {
-      return $(window).scrollTop(this.$el.position().top - 110);
-    };
-
     return DataView;
 
   })(Backbone.View);
@@ -192,58 +180,20 @@
       "keydown #search_bar input": "search",
       "change #search_bar input": "search",
       "click #search_bar .button": "search",
-      "focus #search_list_input": "list_focus",
-      "keydown #search_list_input": "list_keydown",
       "click .delete": "delete",
       "click .menu .new": "render_new",
+      "click #search_bar .new": "click_new",
       "click .save": "editing"
     };
 
-    IndexView.prototype.list_focus = function(e) {
-      if (this.nowIndex === false) {
-        this.nowIndex = 0;
-        this.views[this.nowIndex].select();
-        return this.views[this.nowIndex].scroll();
-      }
-    };
-
-    IndexView.prototype.list_keydown = function(e) {
-      var textareaEle;
-      if (e.keyCode === 9) {
-        textareaEle = this.getTextareaEle();
-        textareaEle.focus();
-        return false;
-      }
-      if (e.keyCode === 40) this.focus_data(this.nowIndex + 1);
-      if (e.keyCode === 38) this.focus_data(this.nowIndex - 1);
-      if (e.keyCode === 13) {
-        this.views[this.nowIndex].edit();
-        textareaEle = this.getTextareaEle();
-        textareaEle.focus();
-        return false;
-      }
-    };
-
-    IndexView.prototype.nowIndex = false;
-
-    IndexView.prototype.focus_data = function(i) {
-      if (this.views[i] && this.views[this.nowIndex]) {
-        this.views[this.nowIndex].unselect();
-      }
-      if (this.views[i]) {
-        this.nowIndex = i;
-        this.views[i].select();
-        return this.views[i].scroll();
-      }
-    };
-
     IndexView.prototype.editing = function(e) {
-      var line, textarea, textareaEle;
-      textareaEle = this.getTextareaEle();
-      textarea = textareaEle.val();
-      if (textarea === "") return;
+      var line, textarea;
+      textarea = $(this.$("#content-left-wrap textarea")[0]).val();
       line = textarea.split("\n");
-      this.setTextareaTile(line[0], line[1], line[2], line[3]);
+      this.$("#content-left-wrap .title").html(line[0]);
+      this.$("#content-left-wrap .ans1").html(line[1]);
+      this.$("#content-left-wrap .ans2").html(line[2]);
+      this.$("#content-left-wrap .ans3").html(line[3]);
       if (this.model) {
         this.model.set({
           title: line[0],
@@ -264,122 +214,41 @@
       }
     };
 
-    IndexView.prototype.getTextareaEle = function() {
-      if (!this.textareaEl) {
-        this.textareaEl = $(this.$("#content-left-wrap textarea")[0]);
-      }
-      return this.textareaEl;
-    };
-
-    IndexView.prototype.getSearchbarEle = function() {
-      if (!this.searchbarEle) {
-        this.searchbarEle = $(this.$("#search_bar input")[0]);
-      }
-      return this.searchbarEle;
-    };
-
-    IndexView.prototype.getSearchbarButtonEle = function() {
-      if (!this.searchbarButtonEle) {
-        this.searchbarButtonEle = $(this.$("#search_bar .button")[0])[0];
-      }
-      return this.searchbarButtonEle;
-    };
-
-    IndexView.prototype.getResultListEle = function() {
-      if (!this.resultListEle) this.resultListEle = this.$("#search_list");
-      return this.resultListEle;
-    };
-
-    IndexView.prototype.getResultListInputEle = function() {
-      if (!this.resultListInputEle) {
-        this.resultListInputEle = this.$("#search_list_input");
-      }
-      return this.resultListInputEle;
-    };
-
-    IndexView.prototype.setTextareaTile = function(title, ans1, ans2, ans3) {
-      if (ans1 == null) ans1 = "";
-      if (ans2 == null) ans2 = "";
-      if (ans3 == null) ans3 = "";
-      if (!this.textareaTitleEle) {
-        this.textareaTitleEle = this.$("#content-left-wrap .title");
-      }
-      if (!this.textareaAns1Ele) {
-        this.textareaAns1Ele = this.$("#content-left-wrap .ans1");
-      }
-      if (!this.textareaAns2Ele) {
-        this.textareaAns2Ele = this.$("#content-left-wrap .ans2");
-      }
-      if (!this.textareaAns3Ele) {
-        this.textareaAns3Ele = this.$("#content-left-wrap .ans3");
-      }
-      if (!title) title = "";
-      if (!ans1) ans1 = "";
-      if (!ans2) ans2 = "";
-      if (!ans3) ans3 = "";
-      this.textareaTitleEle.html(title);
-      this.textareaAns1Ele.html(ans1);
-      this.textareaAns2Ele.html(ans2);
-      return this.textareaAns3Ele.html(ans3);
-    };
-
     IndexView.prototype.addWord = function(word) {
-      var textarea, textareaEle;
+      var textarea;
       if (word == null) word = "";
       if (word === "") return;
-      textareaEle = this.getTextareaEle();
-      textarea = textareaEle.val();
+      textarea = $(this.$("#content-left-wrap textarea")[0]).val();
       if (textarea === "") {
         textarea += word;
       } else {
         textarea += "\n" + word;
       }
-      textareaEle.val(textarea);
+      $(this.$("#content-left-wrap textarea")[0]).val(textarea);
       return this.editing();
     };
 
-    IndexView.prototype.isSearch = true;
-
-    IndexView.prototype.old_search_text = "";
+    IndexView.prototype.click_new = function() {
+      var text;
+      text = $(this.$("#search_bar input")[0]).val();
+      this.render_new();
+      $(this.$("#content-left-wrap textarea")[0]).val(text);
+      return this.editing();
+    };
 
     IndexView.prototype.search = function(e) {
-      var data, datas, el, searchbarButtonEle, searchbarEle, text, textareaEle, _i, _len;
-      searchbarEle = this.getSearchbarEle();
-      text = searchbarEle.val();
-      if (text !== this.old_search_text) {
-        this.old_search_text = text;
-        datas = Datas.filter(function(obj) {
-          return obj.get("title").search(text) !== -1;
-        });
-        this.clear();
-        if (datas.length === 0 && this.isSearch) {
-          this.isSearch = false;
-          searchbarButtonEle = this.getSearchbarButtonEle();
-          searchbarButtonEle.innerHTML = "create";
-        }
-        if (datas.length > 0 && !this.isSearch) {
-          this.isSearch = true;
-          searchbarButtonEle = this.getSearchbarButtonEle();
-          searchbarButtonEle.innerHTML = "search";
-        }
-        for (_i = 0, _len = datas.length; _i < _len; _i++) {
-          data = datas[_i];
-          this.addOne(data);
-        }
+      var data, datas, text, _i, _len, _results;
+      text = $(this.$("#search_bar input")[0]).val();
+      datas = Datas.filter(function(obj) {
+        return obj.get("title").search(text) !== -1;
+      });
+      this.clear();
+      _results = [];
+      for (_i = 0, _len = datas.length; _i < _len; _i++) {
+        data = datas[_i];
+        _results.push(this.addOne(data));
       }
-      if (e.keyCode === 13) {
-        if (!this.isSearch) {
-          textareaEle = this.getTextareaEle();
-          this.render_new();
-          text = text.replace("\n", "");
-          textareaEle.val(text);
-          textareaEle.focus();
-          return false;
-        } else {
-          el = this.getResultListInputEle();
-          return el.focus();
-        }
-      }
+      return _results;
     };
 
     IndexView.prototype.initialize = function() {
@@ -389,36 +258,35 @@
     };
 
     IndexView.prototype.render_textarea = function(model) {
-      var line, textarea, textareaEle;
+      var line, textarea;
       this.model = model;
       textarea = this.model.get("text");
       line = textarea.split("\n");
-      this.setTextareaTile(line[0], line[1], line[2], line[3]);
-      textareaEle = this.getTextareaEle();
-      return textareaEle.val(textarea);
+      this.$("#content-left-wrap .title").html(line[0]);
+      this.$("#content-left-wrap .ans1").html(line[1]);
+      this.$("#content-left-wrap .ans2").html(line[2]);
+      this.$("#content-left-wrap .ans3").html(line[3]);
+      return this.$("#content-left-wrap textarea").val(textarea);
     };
 
     IndexView.prototype.render_new = function() {
-      var textareaEle;
       this.model = null;
-      this.setTextareaTile();
-      textareaEle = this.getTextareaEle();
-      return textareaEle.val("");
+      this.$("#content-left-wrap .title").html("");
+      this.$("#content-left-wrap .ans1").html("");
+      this.$("#content-left-wrap .ans2").html("");
+      this.$("#content-left-wrap .ans3").html("");
+      return this.$("#content-left-wrap textarea").val("");
     };
 
     IndexView.prototype.render = function(event, model) {};
 
-    IndexView.prototype.views = [];
-
     IndexView.prototype.clear = function() {
-      this.getResultListEle().html("");
-      this.views = [];
-      return this.nowIndex = false;
+      return this.$("#search_list").html("");
     };
 
     IndexView.prototype["delete"] = function(e) {
       if (confirm("delete?")) {
-        if (this.model) this.model.destroy();
+        this.model.destroy();
         this.render_new();
         this.clear();
         this.addAll();
@@ -438,8 +306,7 @@
         model: data
       });
       view.setParent(this);
-      this.getResultListEle().append(view.render().el);
-      return this.views.push(view);
+      return this.$("#search_list").append(view.render().el);
     };
 
     return IndexView;
