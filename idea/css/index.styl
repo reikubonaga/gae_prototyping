@@ -52,6 +52,8 @@ body
     color grey
   .ans1
     font-weight bold
+  .words
+    height 100px
   textarea
     width 100%
     height 300px
@@ -132,10 +134,33 @@ body
     padding-left 5%
     color grey
     cursor pointer
-  .show-list
-    .word
-      background grey
-      color white
-      margin-right 5px
-      font-size 7px
-      padding 3px 5px
+.show-list
+  .word
+    display inline-block
+    margin-top 5px
+    margin-right 5px
+    border-bottom solid 1px grey
+    color grey
+    padding 0px
+    font-size 7px
+  a
+    padding 3px 5px
+    margin-right 5px
+    font-size 7px
+  .word.sub
+    background yellow
+    color black
+    padding 3px 5px 0px 5px
+    border-bottom none
+  .word.l1
+    border-bottom solid 1px silver
+    color silver
+    margin-left 20px
+  .word.l2
+    border-bottom solid 1px silver
+    color silver
+    margin-left 40px
+  .word.l3
+    border-bottom solid 1px silver
+    color silver
+    margin-left 60px

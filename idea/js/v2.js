@@ -1,5 +1,5 @@
 (function() {
-  var Data, DataList, DataView, Datas, IndexView,
+  var Data, DataList, DataView, Datas, IndexView, ShortcutKeys,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
@@ -14,7 +14,9 @@
 
     Data.prototype["default"] = {
       title: "",
-      ans1: ""
+      ans1: "",
+      ans2: "",
+      ans3: ""
     };
 
     Data.prototype.initialize = function() {
@@ -31,77 +33,29 @@
       return this.destroy();
     };
 
-    Data.prototype.get_word_els = function(start, length) {
-      var a, ans_word_num, els, first, i, left, line, now_left, now_length, span, text, textarea, _ref;
-      if (start == null) start = 0;
-      if (length == null) length = 0;
+    Data.prototype.get_word = function() {
+      var a, el, i, line, span, text, textarea, _ref;
       textarea = this.get("text");
       line = textarea.split("\n");
-      ans_word_num = 2;
-      if (line.length < ans_word_num + 1) return false;
-      if (length === 0) length = line.length;
-      els = [];
-      left = 0;
-      first = true;
-      now_length = 0;
-      for (i = ans_word_num, _ref = line.length - 1; ans_word_num <= _ref ? i <= _ref : i >= _ref; ans_word_num <= _ref ? i++ : i--) {
-        now_left = left;
-        if (!line[i] || line[i] === "") {
-          if (left > 0) left -= 1;
-          now_length += 1;
-          length += 1;
-          continue;
-        }
+      if (line.length < 5) return false;
+      el = document.createElement("div");
+      for (i = 4, _ref = line.length - 1; 4 <= _ref ? i <= _ref : i >= _ref; 4 <= _ref ? i++ : i--) {
+        if (line[i] === "") continue;
         text = line[i];
-        if (text[0] === " " || text[0] === "　") {
-          now_length += 1;
-          length += 1;
-          continue;
-        }
+        if (text[0] === " " || text[0] === "　") continue;
         span = document.createElement("span");
-        if (text.search(/^http/) !== -1) {
+        if (text.search("/^http/") !== -1) {
           a = document.createElement("a");
           a.innerHTML = line[i];
           a.setAttribute("href", line[i]);
-          a.setAttribute("target", "blank");
           span.appendChild(a);
-        } else if (text.search(/^-/) !== -1) {
-          left += 1;
-          span.className = "word";
-          span.innerHTML = line[i].substr(1);
-        } else if (text.search(/^!|(!-)|(-!)/) !== -1) {
-          span.className = "word sub";
-          span.innerHTML = line[i].substr(1);
         } else {
           span.className = "word";
           span.innerHTML = line[i];
         }
-        if (now_left > 0) span.className = span.className + " l" + now_left;
-        if (now_length < start || now_length >= start + length) {
-          first = false;
-          now_length += 1;
-          continue;
-        }
-        if (now_left !== left && !first) els.push(document.createElement("br"));
-        els.push(span);
-        if (first) first = false;
-        if (left > 0) els.push(document.createElement("br"));
-        now_length += 1;
+        el.appendChild(span);
       }
-      return els;
-    };
-
-    Data.prototype.get_word = function() {
-      var el, els, output, _i, _len;
-      els = this.get_word_els();
-      output = document.createElement("div");
-      if (els) {
-        for (_i = 0, _len = els.length; _i < _len; _i++) {
-          el = els[_i];
-          output.appendChild(el);
-        }
-      }
-      return output;
+      return el;
     };
 
     return Data;
@@ -156,12 +110,20 @@
         this.model.set("ans1", "");
         this.model.save();
       }
+      if (!this.model.get("ans2")) {
+        this.model.set("ans2", "");
+        this.model.save();
+      }
+      if (!this.model.get("ans3")) {
+        this.model.set("ans3", "");
+        this.model.save();
+      }
       if (!this.model.get("title")) {
         this.model.destroy();
         return false;
       }
       if (!this.model.get("text")) {
-        this.model.set("text", this.model.get("title") + "\n" + this.model.get("ans1"));
+        this.model.set("text", this.model.get("title") + "\n" + this.model.get("ans1") + "\n" + this.model.get("ans2") + "\n" + this.model.get("ans3"));
         this.model.save();
       }
       this.$el.html(this.template());
@@ -225,7 +187,7 @@
     IndexView.prototype.el = "body";
 
     IndexView.prototype.events = {
-      "keyup #content-left-wrap textarea": "editing",
+      "keydown #content-left-wrap textarea": "editing",
       "change #content-left-wrap textarea": "editing",
       "keydown #search_bar input": "search",
       "change #search_bar input": "search",
@@ -238,8 +200,11 @@
     };
 
     IndexView.prototype.list_focus = function(e) {
-      if (this.nowIndex === false) this.focus_data(0);
-      return this.views[this.nowIndex].select();
+      if (this.nowIndex === false) {
+        this.nowIndex = 0;
+        this.views[this.nowIndex].select();
+        return this.views[this.nowIndex].scroll();
+      }
     };
 
     IndexView.prototype.list_keydown = function(e) {
@@ -247,16 +212,14 @@
       if (e.keyCode === 9) {
         textareaEle = this.getTextareaEle();
         textareaEle.focus();
-        if (this.views[this.nowIndex]) this.views[this.nowIndex].unselect();
         return false;
       }
-      if (e.keyCode === 40 || e.keyCode === 74) this.focus_data(this.nowIndex + 1);
-      if (e.keyCode === 38 || e.keyCode === 75) this.focus_data(this.nowIndex - 1);
+      if (e.keyCode === 40) this.focus_data(this.nowIndex + 1);
+      if (e.keyCode === 38) this.focus_data(this.nowIndex - 1);
       if (e.keyCode === 13) {
         this.views[this.nowIndex].edit();
         textareaEle = this.getTextareaEle();
         textareaEle.focus();
-        if (this.views[this.nowIndex]) this.views[this.nowIndex].unselect();
         return false;
       }
     };
@@ -275,24 +238,18 @@
     };
 
     IndexView.prototype.editing = function(e) {
-      var arr, line, now_line, range, text, textarea, textareaEle;
+      var line, textarea, textareaEle;
       textareaEle = this.getTextareaEle();
       textarea = textareaEle.val();
       if (textarea === "") return;
       line = textarea.split("\n");
-      range = $(e.target).getSelection();
-      text = textarea.substr(0, range.start);
-      arr = text.match(/\n/g);
-      if (arr) {
-        now_line = arr.length + 1;
-      } else {
-        now_line = 1;
-      }
-      this.setTextareaTitle(line, now_line);
+      this.setTextareaTile(line[0], line[1], line[2], line[3]);
       if (this.model) {
         this.model.set({
           title: line[0],
           ans1: line[1],
+          ans2: line[2],
+          ans3: line[3],
           text: textarea
         });
         return this.model.save();
@@ -300,6 +257,8 @@
         return this.model = Datas.create({
           title: line[0],
           ans1: line[1],
+          ans2: line[2],
+          ans3: line[3],
           text: textarea
         });
       }
@@ -338,43 +297,30 @@
       return this.resultListInputEle;
     };
 
-    IndexView.prototype.setTextareaTitle = function(line, now_line_num) {
-      var ans1, divEle, el, els, start_line, title, _i, _len;
+    IndexView.prototype.setTextareaTile = function(title, ans1, ans2, ans3) {
+      if (ans1 == null) ans1 = "";
+      if (ans2 == null) ans2 = "";
+      if (ans3 == null) ans3 = "";
       if (!this.textareaTitleEle) {
         this.textareaTitleEle = this.$("#content-left-wrap .title");
       }
       if (!this.textareaAns1Ele) {
         this.textareaAns1Ele = this.$("#content-left-wrap .ans1");
       }
-      if (!this.textareaWordsEle) {
-        this.textareaWordsEle = $(this.$("#content-left-wrap .words")[0]);
+      if (!this.textareaAns2Ele) {
+        this.textareaAns2Ele = this.$("#content-left-wrap .ans2");
       }
-      if (!line[0]) {
-        title = "";
-      } else {
-        title = line[0];
+      if (!this.textareaAns3Ele) {
+        this.textareaAns3Ele = this.$("#content-left-wrap .ans3");
       }
-      if (!line[1]) {
-        ans1 = "";
-      } else {
-        ans1 = line[1];
-      }
+      if (!title) title = "";
+      if (!ans1) ans1 = "";
+      if (!ans2) ans2 = "";
+      if (!ans3) ans3 = "";
       this.textareaTitleEle.html(title);
       this.textareaAns1Ele.html(ans1);
-      this.textareaWordsEle.html("");
-      if (!this.model) return;
-      if (now_line_num < 7) {
-        start_line = 0;
-      } else {
-        start_line = now_line_num - 3;
-      }
-      els = this.model.get_word_els(start_line, 7);
-      divEle = document.createElement("div");
-      for (_i = 0, _len = els.length; _i < _len; _i++) {
-        el = els[_i];
-        divEle.appendChild(el);
-      }
-      return this.textareaWordsEle.append(divEle);
+      this.textareaAns2Ele.html(ans2);
+      return this.textareaAns3Ele.html(ans3);
     };
 
     IndexView.prototype.addWord = function(word) {
@@ -421,7 +367,7 @@
           this.addOne(data);
         }
       }
-      if (e && e.keyCode === 13) {
+      if (e.keyCode === 13) {
         if (!this.isSearch) {
           textareaEle = this.getTextareaEle();
           this.render_new();
@@ -431,46 +377,15 @@
           return false;
         } else {
           el = this.getResultListInputEle();
-          el.focus();
-          if (this.views[this.nowIndex]) return this.views[this.nowIndex].select();
+          return el.focus();
         }
       }
     };
 
     IndexView.prototype.initialize = function() {
-      var self;
       Datas.bind("reset", this.addAll, this);
       Datas.bind("all", this.render, this);
-      self = this;
-      return Datas.fetch({
-        success: function(collection) {
-          if (collection.length === 0) {
-            Datas.create({
-              title: "How to use search",
-              ans1: "1. Type tab. then focus searchbar",
-              ans2: "2. Type \"use\" and enter. then the results show and focus search result",
-              ans3: "3. Type j or k (Down or Up) and enter. then move to search bar results and focus textarea",
-              text: "How to use search and edit\n1. Type tab. then focus searchbar\n2. Type \"use\". then the results show and focus search result\n3. Type j or k (Down or Up) and enter. then move to search bar results and focus textarea\n"
-            });
-            Datas.create({
-              title: "How to use textarea",
-              ans1: "1. Type tab. then focus serchbar",
-              ans2: "2. Type \"first text\" and enter. then the new text is created and focus textarea",
-              ans3: "The text is always saved when you type",
-              text: "How to use textarea\n1. Type tab. then focus serchbar\n2. Type \"first text\" and enter. then the new text is created and focus textarea\nThe text is always saved when you type\n"
-            });
-            Datas.create({
-              title: "Follow me",
-              ans1: "I am Rei Kubonaga",
-              ans2: "I am working at Kwl-E",
-              ans3: "if you have something to think, please send me the message",
-              text: "Follow me\nI am Rei Kubonaga\nI studied mathematics in Kyoto University and working in Kwl-E\nif you have something to think, please send me the message\nhttps://twitter.com/kubonagarei\nenable link"
-            });
-            Datas.each(self.addOne);
-            return self.views[0].edit();
-          }
-        }
-      });
+      return Datas.fetch();
     };
 
     IndexView.prototype.render_textarea = function(model) {
@@ -478,7 +393,7 @@
       this.model = model;
       textarea = this.model.get("text");
       line = textarea.split("\n");
-      this.setTextareaTitle(line, 0);
+      this.setTextareaTile(line[0], line[1], line[2], line[3]);
       textareaEle = this.getTextareaEle();
       return textareaEle.val(textarea);
     };
@@ -486,7 +401,7 @@
     IndexView.prototype.render_new = function() {
       var textareaEle;
       this.model = null;
-      this.setTextareaTitle();
+      this.setTextareaTile();
       textareaEle = this.getTextareaEle();
       return textareaEle.val("");
     };
@@ -506,24 +421,15 @@
         if (this.model) this.model.destroy();
         this.render_new();
         this.clear();
-        this.old_search_text = false;
-        this.search();
-        if (this.views[0]) this.views[0].scroll();
+        this.addAll();
       }
       return this.model = null;
     };
 
     IndexView.prototype.addAll = function() {
-      var datas, textareaEle;
-      datas = Datas.sortBy(function(item) {
+      return _.each(Datas.sortBy(function(item) {
         return item.cid;
-      });
-      if (!datas || datas.length === 0) {} else {
-        _.each(datas, this.addOne);
-        this.views[0].scroll();
-      }
-      textareaEle = this.getTextareaEle();
-      return textareaEle.focus();
+      }), this.addOne);
     };
 
     IndexView.prototype.addOne = function(data) {
@@ -540,9 +446,30 @@
 
   })(Backbone.View);
 
+  ShortcutKeys = (function(_super) {
+
+    __extends(ShortcutKeys, _super);
+
+    function ShortcutKeys() {
+      ShortcutKeys.__super__.constructor.apply(this, arguments);
+    }
+
+    ShortcutKeys.prototype.shortcuts = {
+      "ctrl+r": "reloadPage"
+    };
+
+    ShortcutKeys.prototype.reloadPage = function() {
+      return alert("Reload!!!");
+    };
+
+    return ShortcutKeys;
+
+  })(Backbone.Shortcuts);
+
   $(function() {
-    var view;
-    return view = new IndexView;
+    var shortcuts, view;
+    view = new IndexView;
+    return shortcuts = new ShortcutKeys;
   });
 
 }).call(this);

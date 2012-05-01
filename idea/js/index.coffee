@@ -5,8 +5,6 @@ class Data extends Backbone.Model
   default:
     title:""
     ans1:""
-    ans2:""
-    ans3:""
   initialize:()->
     @on "change",(model)->
       date = new Date()
@@ -16,29 +14,72 @@ class Data extends Backbone.Model
       model.set "updated",time
   clear:()->
     @destroy()
-  get_word:()->
+
+  get_word_els:(start=0,length=0)->
     textarea = @get "text"
     line = textarea.split("\n")
-    if line.length < 5
+    ans_word_num = 2
+    if line.length < ans_word_num+1
       return false
-    el = document.createElement "div"
-    for i in [4..line.length-1]
-      if line[i] is ""
+    if length is 0
+      length = line.length
+    els = []
+    left = 0
+    first = true
+    now_length = 0
+    for i in [ans_word_num..line.length-1]
+      now_left = left
+      if not line[i] or line[i] is ""
+        if left > 0
+          left -= 1
+        now_length += 1
+        length += 1
         continue
       text = line[i]
       if text[0] is " " or text[0] is "　"
+        now_length += 1
+        length += 1
         continue
       span = document.createElement "span"
-      if text.search("/^http/") isnt -1
+      if text.search(/^http/) isnt -1
         a = document.createElement "a"
         a.innerHTML = line[i]
         a.setAttribute "href",line[i]
+        a.setAttribute "target","blank"
         span.appendChild a
+      else if text.search(/^-/) isnt -1
+        left += 1
+        span.className = "word"
+        span.innerHTML = line[i].substr(1)
+      else if text.search(/^!|(!-)|(-!)/) isnt -1
+        span.className = "word sub"
+        span.innerHTML = line[i].substr(1)
       else
         span.className = "word"
         span.innerHTML = line[i]
-      el.appendChild span
-    return el
+      if now_left > 0
+        span.className = span.className + " l" + now_left
+      if now_length < start or now_length >= start+length
+        first = false
+        now_length += 1
+        continue
+      if now_left isnt left and not first
+        els.push document.createElement "br"
+      els.push span
+      if first
+        first = false
+      if left > 0
+        els.push document.createElement "br"
+      now_length += 1
+    return els
+
+  get_word:()->
+    els = @get_word_els()
+    output = document.createElement "div"
+    if els
+      for el in els
+        output.appendChild el
+    return output
 
 
 class DataList extends Backbone.Collection
@@ -61,17 +102,11 @@ class DataView extends Backbone.View
     if not @model.get "ans1"
       @model.set "ans1",""
       @model.save()
-    if not @model.get "ans2"
-      @model.set "ans2",""
-      @model.save()
-    if not @model.get "ans3"
-      @model.set "ans3",""
-      @model.save()
     if not @model.get("title")
       @model.destroy()
       return false
     if not @model.get "text"
-      @model.set "text",@model.get("title")+"\n"+@model.get("ans1")+"\n"+@model.get("ans2")+"\n"+@model.get("ans3")
+      @model.set "text",@model.get("title")+"\n"+@model.get("ans1")
       @model.save()
     @$el.html @template()
     @show()
@@ -102,7 +137,7 @@ class DataView extends Backbone.View
 class IndexView extends Backbone.View
   el:"body"
   events:
-    "keydown #content-left-wrap textarea":"editing"
+    "keyup #content-left-wrap textarea":"editing"
     "change #content-left-wrap textarea":"editing"
     "keydown #search_bar input":"search"
     "change #search_bar input":"search"
@@ -114,34 +149,36 @@ class IndexView extends Backbone.View
     "click .save":"editing"
   list_focus:(e)->
     if @nowIndex is false
-      @nowIndex = 0
-      @views[@nowIndex].select()
-      @views[@nowIndex].scroll()
+      @focus_data 0
+    @views[@nowIndex].select()
 
   list_keydown:(e)->
     #tab
     if e.keyCode is 9
       textareaEle = @getTextareaEle()
       textareaEle.focus()
+      if @views[@nowIndex]
+        @views[@nowIndex].unselect()
       return false
     #up
-    if e.keyCode is 40
+    if e.keyCode is 40 or e.keyCode is 74
       @focus_data @nowIndex+1
     #down
-    if e.keyCode is 38
+    if e.keyCode is 38 or e.keyCode is 75
       @focus_data @nowIndex-1
     #enter
     if e.keyCode is 13
       @views[@nowIndex].edit()
       textareaEle = @getTextareaEle()
       textareaEle.focus()
+      if @views[@nowIndex]
+        @views[@nowIndex].unselect()
       return false
 
   nowIndex:false
   focus_data:(i)->
     if @views[i] and @views[@nowIndex]
       @views[@nowIndex].unselect()
-
     if @views[i]
       @nowIndex = i
       @views[i].select()
@@ -153,21 +190,24 @@ class IndexView extends Backbone.View
     if textarea is ""
       return
     line = textarea.split("\n")
-    @setTextareaTile line[0],line[1],line[2],line[3]
+    range = $(e.target).getSelection()
+    text = textarea.substr(0,range.start)
+    arr = text.match(/\n/g)
+    if arr
+      now_line = arr.length+1
+    else
+      now_line = 1
+    @setTextareaTitle line,now_line
     if @model
       @model.set
         title:line[0]
         ans1:line[1]
-        ans2:line[2]
-        ans3:line[3]
         text:textarea
       @model.save()
     else
       @model = Datas.create
         title:line[0]
         ans1:line[1]
-        ans2:line[2]
-        ans3:line[3]
         text:textarea
 
   getTextareaEle:()->
@@ -195,27 +235,38 @@ class IndexView extends Backbone.View
       @resultListInputEle = @$("#search_list_input")
     @resultListInputEle
 
-  setTextareaTile:(title,ans1="",ans2="",ans3="")->
+  setTextareaTitle:(line,now_line_num)->
     if not @textareaTitleEle
       @textareaTitleEle = @$("#content-left-wrap .title")
     if not @textareaAns1Ele
       @textareaAns1Ele = @$("#content-left-wrap .ans1")
-    if not @textareaAns2Ele
-      @textareaAns2Ele = @$("#content-left-wrap .ans2")
-    if not @textareaAns3Ele
-      @textareaAns3Ele = @$("#content-left-wrap .ans3")
-    if not title
+    if not @textareaWordsEle
+      @textareaWordsEle = $(@$("#content-left-wrap .words")[0])
+
+    if not line[0]
       title = ""
-    if not ans1
+    else
+      title = line[0]
+    if not line[1]
       ans1 = ""
-    if not ans2
-      ans2 = ""
-    if not ans3
-      ans3 = ""
+    else
+      ans1 = line[1]
     @textareaTitleEle.html title
     @textareaAns1Ele.html ans1
-    @textareaAns2Ele.html ans2
-    @textareaAns3Ele.html ans3
+    @textareaWordsEle.html ""
+    if not @model
+      return
+    if now_line_num < 7
+      start_line = 0
+    else
+      start_line = now_line_num-3
+    els = @model.get_word_els start_line,7
+    divEle = document.createElement "div"
+    for el in els
+      divEle.appendChild el
+    @textareaWordsEle.append divEle
+
+
 
   addWord:(word = "")->
     if word is ""
@@ -250,7 +301,7 @@ class IndexView extends Backbone.View
       for data in datas
         @addOne data
     #enter
-    if e.keyCode is 13
+    if e and e.keyCode is 13
       if not @isSearch
         textareaEle = @getTextareaEle()
         @render_new()
@@ -261,23 +312,49 @@ class IndexView extends Backbone.View
       else
         el = @getResultListInputEle()
         el.focus()
+        if @views[@nowIndex]
+          @views[@nowIndex].select()
 
   initialize:()->
     #Datas.bind "add",@addOne,@
     Datas.bind "reset",@addAll,@
     Datas.bind "all",@render,@
-    Datas.fetch()
+    self = @
+    Datas.fetch(
+      success:(collection)->
+        if collection.length is 0
+          Datas.create
+            title:"How to use search"
+            ans1:"1. Type tab. then focus searchbar"
+            ans2:"2. Type \"use\" and enter. then the results show and focus search result"
+            ans3:"3. Type j or k (Down or Up) and enter. then move to search bar results and focus textarea"
+            text:"How to use search and edit\n1. Type tab. then focus searchbar\n2. Type \"use\". then the results show and focus search result\n3. Type j or k (Down or Up) and enter. then move to search bar results and focus textarea\n"
+          Datas.create
+            title:"How to use textarea"
+            ans1:"1. Type tab. then focus serchbar"
+            ans2:"2. Type \"first text\" and enter. then the new text is created and focus textarea"
+            ans3:"The text is always saved when you type"
+            text:"How to use textarea\n1. Type tab. then focus serchbar\n2. Type \"first text\" and enter. then the new text is created and focus textarea\nThe text is always saved when you type\n"
+          Datas.create
+            title:"Follow me"
+            ans1:"I am Rei Kubonaga"
+            ans2:"I am working at Kwl-E"
+            ans3:"if you have something to think, please send me the message"
+            text:"Follow me\nI am Rei Kubonaga\nI studied mathematics in Kyoto University and working in Kwl-E\nif you have something to think, please send me the message\nhttps://twitter.com/kubonagarei\nenable link"
+          Datas.each self.addOne
+          self.views[0].edit()
+    )
 
   render_textarea:(model)->
     @model = model
     textarea = @model.get "text"
     line = textarea.split("\n")
-    @setTextareaTile line[0],line[1],line[2],line[3]
+    @setTextareaTitle line,0
     textareaEle = @getTextareaEle()
     textareaEle.val textarea
   render_new:()->
     @model = null
-    @setTextareaTile()
+    @setTextareaTitle()
     textareaEle = @getTextareaEle()
     textareaEle.val ""
 
@@ -296,13 +373,22 @@ class IndexView extends Backbone.View
         @model.destroy()
       @render_new()
       @clear()
-      @addAll()
+      @old_search_text = false
+      @search()
+      if @views[0]
+        @views[0].scroll()
     @model = null
 
   addAll:()->
-    _.each(Datas.sortBy((item)->
+    datas = Datas.sortBy((item)->
       item.cid
-    ),@addOne)
+    )
+    if not datas or datas.length is 0
+    else
+      _.each datas,@addOne
+      @views[0].scroll()
+    textareaEle = @getTextareaEle()
+    textareaEle.focus()
 
   addOne:(data)=>
     view = new DataView
@@ -311,11 +397,5 @@ class IndexView extends Backbone.View
     @getResultListEle().append view.render().el
     @views.push view
 
-class ShortcutKeys extends Backbone.Shortcuts
-  shortcuts:
-    "ctrl+r" : "reloadPage"
-  reloadPage: -> alert "Reload!!!"
-
 $ ->
   view = new IndexView
-  shortcuts = new ShortcutKeys

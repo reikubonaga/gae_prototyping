@@ -10,8 +10,8 @@
   <script src="/static/js/autoresize.jquery.js"></script>
   <script src="/static/js/backbone.js"></script>
   <script src="/static/js/backbone-localstorage.js"></script>
-  <script src="/static/js/jquery-fieldselection.js"></script>
-  <link href="css/index.css" rel="stylesheet">
+  <script src="/static/js/backbone.shortcuts.js"></script>
+  <link href="css/v1.css" rel="stylesheet">
 </head>
 <body>
 <div id="header-wrap">
@@ -33,7 +33,8 @@
   <div id="content-left-wrap">
     <div class="title"></div>
     <div class="ans ans1"></div>
-    <div class="words show-list"></div>
+    <div class="ans ans2"></div>
+    <div class="ans ans3"></div>
     <textarea tabindex="1"></textarea>
     <div class="foot">
       <span class="delete button">delete</span>
@@ -45,6 +46,7 @@
       <input type="text" tabindex="2">
       <span class="button search">search</span>
     </div>
+    <div class="clearfix"></div>
     <input id="search_list_input" tabindex="3">
     <!--<div id="search_menu">
       <ul>
@@ -52,9 +54,7 @@
         <li></li>
       </ul>
     </div>-->
-    <div class="clearfix"></div>
-    <div id="search_list">
-    </div>
+    <div id="search_list"></div>
   </div>
 </div>
 <div class="clearfix"></div>
@@ -66,8 +66,11 @@
   <!--<span class="paste button">paste</span>-->
 </div>
 <div class="ans ans1 word"><%=ans1?ans1:""%></div>
+<div class="ans ans2 word"><%=ans2?ans2:""%></div>
+<div class="ans ans3 word"><%=ans3?ans3:""%></div>
 <div class="ans show-list"></div>
 </script>
-<script src="js/index.js"></script>
+<script src="js/v2.js"></script>
+
 </body>
 </html>
