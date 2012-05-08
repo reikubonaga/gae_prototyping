@@ -47,13 +47,32 @@ class Data extends Backbone.Model
         a.setAttribute "href",line[i]
         a.setAttribute "target","blank"
         span.appendChild a
+      else if text.search(/^(!-)|(-!)/) isnt -1
+        left += 1
+        span.className = "word sub"
+        span.innerHTML = line[i].substr(2)
       else if text.search(/^-/) isnt -1
         left += 1
         span.className = "word"
         span.innerHTML = line[i].substr(1)
-      else if text.search(/^!|(!-)|(-!)/) isnt -1
+      else if text.search(/^!/) isnt -1
         span.className = "word sub"
         span.innerHTML = line[i].substr(1)
+      else if text.search(/->/) isnt -1
+        span.className = "word flow"
+        text_arr = text.split "->"
+        for j in [0..text_arr.length-1]
+          text = text_arr[j]
+          if text is ""
+            continue
+          d = document.createElement "div"
+          d.innerHTML = text
+          span.appendChild d
+          if text_arr.length-1 isnt j
+            d = document.createElement "div"
+            d.innerHTML = "▶"
+            span.appendChild d
+
       else
         span.className = "word"
         span.innerHTML = line[i]
@@ -243,11 +262,11 @@ class IndexView extends Backbone.View
     if not @textareaWordsEle
       @textareaWordsEle = $(@$("#content-left-wrap .words")[0])
 
-    if not line[0]
+    if not line or not line[0]
       title = ""
     else
       title = line[0]
-    if not line[1]
+    if not line or not line[1]
       ans1 = ""
     else
       ans1 = line[1]

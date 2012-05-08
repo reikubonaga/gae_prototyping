@@ -32,7 +32,7 @@
     };
 
     Data.prototype.get_word_els = function(start, length) {
-      var a, ans_word_num, els, first, i, left, line, now_left, now_length, span, text, textarea, _ref;
+      var a, ans_word_num, d, els, first, i, j, left, line, now_left, now_length, span, text, text_arr, textarea, _ref, _ref2;
       if (start == null) start = 0;
       if (length == null) length = 0;
       textarea = this.get("text");
@@ -65,13 +65,32 @@
           a.setAttribute("href", line[i]);
           a.setAttribute("target", "blank");
           span.appendChild(a);
+        } else if (text.search(/^(!-)|(-!)/) !== -1) {
+          left += 1;
+          span.className = "word sub";
+          span.innerHTML = line[i].substr(2);
         } else if (text.search(/^-/) !== -1) {
           left += 1;
           span.className = "word";
           span.innerHTML = line[i].substr(1);
-        } else if (text.search(/^!|(!-)|(-!)/) !== -1) {
+        } else if (text.search(/^!/) !== -1) {
           span.className = "word sub";
           span.innerHTML = line[i].substr(1);
+        } else if (text.search(/->/) !== -1) {
+          span.className = "word flow";
+          text_arr = text.split("->");
+          for (j = 0, _ref2 = text_arr.length - 1; 0 <= _ref2 ? j <= _ref2 : j >= _ref2; 0 <= _ref2 ? j++ : j--) {
+            text = text_arr[j];
+            if (text === "") continue;
+            d = document.createElement("div");
+            d.innerHTML = text;
+            span.appendChild(d);
+            if (text_arr.length - 1 !== j) {
+              d = document.createElement("div");
+              d.innerHTML = "▶";
+              span.appendChild(d);
+            }
+          }
         } else {
           span.className = "word";
           span.innerHTML = line[i];
@@ -349,12 +368,12 @@
       if (!this.textareaWordsEle) {
         this.textareaWordsEle = $(this.$("#content-left-wrap .words")[0]);
       }
-      if (!line[0]) {
+      if (!line || !line[0]) {
         title = "";
       } else {
         title = line[0];
       }
-      if (!line[1]) {
+      if (!line || !line[1]) {
         ans1 = "";
       } else {
         ans1 = line[1];

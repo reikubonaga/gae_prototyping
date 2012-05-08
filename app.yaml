@@ -64,6 +64,10 @@ handlers:
 - url: /landingpage/static
   static_dir: landingpage/static
 
+- url: /home/static
+  static_dir: home/static
+
+
 - url: /static
   static_dir: static
 
