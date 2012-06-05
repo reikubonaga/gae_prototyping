@@ -1,24 +1,32 @@
 #coffee
 
-#title ans1 ans2 ans3 memo
+doc ?= document
+
+#title memo
 class Data extends Backbone.Model
   default:
     title:""
-    ans1:""
+    access:0
+
   initialize:()->
+    self = @
     @on "change",(model)->
       date = new Date()
       time = date.getTime()
-      if @isNew()
-        model.set "created",time
-      model.set "updated",time
+      if self.isNew()
+        self.set "created",time
+      self.set "updated",time
+
+    if not @get "access"
+      @set "access",0
+
   clear:()->
     @destroy()
 
   get_word_els:(start=0,length=0)->
     textarea = @get "text"
     line = textarea.split("\n")
-    ans_word_num = 2
+    ans_word_num = 1
     if line.length < ans_word_num+1
       return false
     if length is 0
@@ -26,6 +34,25 @@ class Data extends Backbone.Model
     els = []
     left = 0
     first = true
+
+    #tagを取得
+    tags = {}
+    for i in [ans_word_num..line.length-1]
+      text = line[i]
+      if text.search(/^@@/) isnt -1
+        continue
+      if text.search(/^\*@@/) isnt -1
+        continue
+      if text.search(/@@/) isnt -1
+        text_arr = text.split "@@"
+        data = text_arr[0]
+        for j in [1..text_arr.length-1]
+          tag = text_arr[j]
+          if not tags[tag]
+            tags[tag] = [data]
+          else
+            tags[tag].push data
+
     now_length = 0
     for i in [ans_word_num..line.length-1]
       now_left = left
@@ -58,6 +85,20 @@ class Data extends Backbone.Model
       else if text.search(/^!/) isnt -1
         span.className = "word sub"
         span.innerHTML = line[i].substr(1)
+      else if text.search(/<->/) isnt -1
+        span.className = "word flow"
+        text_arr = text.split "<->"
+        for j in [0..text_arr.length-1]
+          text = text_arr[j]
+          if text is ""
+            continue
+          d = document.createElement "div"
+          d.innerHTML = text
+          span.appendChild d
+          if text_arr.length-1 isnt j
+            d = document.createElement "div"
+            d.innerHTML = "◀▶"
+            span.appendChild d
       else if text.search(/->/) isnt -1
         span.className = "word flow"
         text_arr = text.split "->"
@@ -73,6 +114,121 @@ class Data extends Backbone.Model
             d.innerHTML = "▶"
             span.appendChild d
 
+      else if text.search(/^\*@@.+@@.+@@.+@@.+/) isnt -1
+        span.className = "axis"
+        text_arr = text.split "@@"
+        name_tags = []
+        for j in [1..4]
+          t = text_arr[j]
+          if t.search(/^.+\[.+\]$/) isnt -1
+            _t = t.split "["
+            text_arr[j] = _t[0]
+            name_tags.push _t[1].substr(0,_t[1].length-1)
+          else
+            name_tags.push t
+        div_arr = []
+        for j in [0..3]
+          if j%2 is 0
+            div_box = doc.createElement "div"
+          first = if j > 1 then 1 else 0
+          second = j%2 + 2
+          display_tags = _.intersection tags[text_arr[first+1]],tags[text_arr[second+1]]
+          div = doc.createElement "div"
+          div.className = "box box"+j
+          if j is 1
+            tag = name_tags[first]
+            d = doc.createElement "div"
+            d.className = "tag tag1"
+            d.innerHTML = tag
+            div.appendChild d
+          if j is 2
+            tag = name_tags[second]
+            d = doc.createElement "div"
+            d.className = "tag tag2"
+            d.innerHTML = tag
+            div.appendChild d
+          if j is 3
+            tag = name_tags[second]
+            d = doc.createElement "div"
+            d.className = "tag tag3"
+            d.innerHTML = tag
+            div.appendChild d
+          if display_tags.length isnt 0
+            for data in display_tags
+              d = doc.createElement "div"
+              d.className = "word"
+              d.innerHTML = data
+              div.appendChild d
+          div_box.appendChild div
+          div_arr.push div
+          if j%2 is 1
+            d = doc.createElement "div"
+            d.className = "clearfix"
+            div_box.appendChild d
+            span.appendChild div_box
+        #左
+        tag = name_tags[first]
+        d = doc.createElement "div"
+        d2 = doc.createElement "div"
+        d2.className = "tag4_box"
+        d3 = doc.createElement "div"
+        d3.className = "tag tag4"
+        d3.innerHTML = tag
+        d2.appendChild d3
+        d.appendChild d2
+        span.appendChild d
+
+      else if text.search(/^@@.+@@.+@@.+@@.+/) isnt -1
+        span.className = "matrix"
+        text_arr = text.split "@@"
+        table = doc.createElement "table"
+        name_tags = []
+        for j in [1..4]
+          t = text_arr[j]
+          if t.search(/^.+\[.+\]$/) isnt -1
+            _t = t.split "["
+            text_arr[j] = _t[0]
+            name_tags.push _t[1].substr(0,_t[1].length-1)
+          else
+            name_tags.push t
+        for j in [1..text_arr.length-1]
+          if j%2 is 1
+            tr = doc.createElement "tr"
+          tag = text_arr[j]
+          td = doc.createElement "td"
+          d = doc.createElement "div"
+          d.className = "tag"
+          d.innerHTML = name_tags[j-1]
+          td.appendChild d
+          if tags[tag]
+            for data in tags[tag]
+              d = doc.createElement "div"
+              d.className = "word"
+              d.innerHTML = data
+              td.appendChild d
+          tr.appendChild td
+          if j%2 is 0
+            table.appendChild tr
+        span.appendChild table
+
+      else if text.search(/@@/) isnt -1
+        span.className = "word tags"
+        text_arr = text.split "@@"
+        d = document.createElement "div"
+        d.innerHTML = text_arr[0]
+        span.appendChild d
+        for j in [1..text_arr.length-1]
+          text = text_arr[j]
+          if text is ""
+            continue
+          d = document.createElement "div"
+          d.className = "tag"
+          d.innerHTML = text
+          span.appendChild d
+          if text_arr.length-1 isnt j
+            d = document.createElement "div"
+            d.innerHTML = ""
+            span.appendChild d
       else
         span.className = "word"
         span.innerHTML = line[i]
@@ -87,8 +243,7 @@ class Data extends Backbone.Model
       els.push span
       if first
         first = false
-      if left > 0
-        els.push document.createElement "br"
+      els.push document.createElement "br"
       now_length += 1
     return els
 
@@ -100,6 +255,9 @@ class Data extends Backbone.Model
         output.appendChild el
     return output
 
+  show:()->
+    n = @get "access"
+    @set "access",n+1
 
 class DataList extends Backbone.Collection
   model:Data
@@ -109,43 +267,40 @@ Datas = new DataList
 
 class DataView extends Backbone.View
   events:()->
-    "click .show":"show"
     "click .edit":"edit"
-    "click .paste":"paste"
-    "click .word":"addWord"
   template:()->
     _.template $("#data_template").html(),@model.toJSON()
   tag:"div"
   className:"data"
   render:()->
-    if not @model.get "ans1"
-      @model.set "ans1",""
-      @model.save()
     if not @model.get("title")
       @model.destroy()
       return false
     if not @model.get "text"
-      @model.set "text",@model.get("title")+"\n"+@model.get("ans1")
+      @model.set "text",@model.get("title")
       @model.save()
-    @$el.html @template()
+    div = doc.createElement "div"
+    div.innerHTML = @template()
+    @$el.prepend div
     @show()
     @
+
+  update:()->
+    @render()
+    $(@$el.children()[1]).remove()
+
   setParent:(view)->
     @parent = view
-  isShow:false
-  show:(e)->
-    if not @isShow
-      $(@$(".show-list")[0]).append @model.get_word()
-      @isShow = true
-    else
-      $(@$(".show-list")[0]).html ""
-      @isShow = false
+  show:()->
+    $(@$(".show-list")[0]).append @model.get_word()
   edit:()->
     @parent.render_textarea @model
-  addWord:(e)->
-    @parent.addWord $(e.target).text()
-  paste:()->
-    @parent.addWord $(@$(".title .edit")[0]).html()
+
+#  addWord:(e)->
+#    @parent.addWord $(e.target).text()
+#  paste:()->
+#    @parent.addWord $(@$(".title .edit")[0]).html()
+
   select:()->
     $(@$(".selectertext")[0]).html "▶"
   unselect:()->
@@ -166,6 +321,7 @@ class IndexView extends Backbone.View
     "click .delete":"delete"
     "click .menu .new":"render_new"
     "click .save":"editing"
+
   list_focus:(e)->
     if @nowIndex is false
       @focus_data 0
@@ -179,12 +335,24 @@ class IndexView extends Backbone.View
       if @views[@nowIndex]
         @views[@nowIndex].unselect()
       return false
-    #up
-    if e.keyCode is 40 or e.keyCode is 74
-      @focus_data @nowIndex+1
+
+    height = $(window).height() - 170
+    sum = Math.ceil($(@views[@nowIndex].el).height()/height)
     #down
+    if e.keyCode is 40 or e.keyCode is 74
+      if @nowScrollIndex<sum
+        $(window).scrollTop $(window).scrollTop()+height
+        @nowScrollIndex += 1;
+      else
+        @focus_data @nowIndex+1
+    #up
     if e.keyCode is 38 or e.keyCode is 75
-      @focus_data @nowIndex-1
+      if @nowScrollIndex>1
+        $(window).scrollTop $(window).scrollTop()-height
+        @nowScrollIndex -= 1;
+      else
+        @focus_data @nowIndex-1
+
     #enter
     if e.keyCode is 13
       @views[@nowIndex].edit()
@@ -192,9 +360,12 @@ class IndexView extends Backbone.View
       textareaEle.focus()
       if @views[@nowIndex]
         @views[@nowIndex].unselect()
+      @clickedDataView = @views[@nowIndex]
       return false
 
+  clickedDataView:false
   nowIndex:false
+  nowScrollIndex:1
   focus_data:(i)->
     if @views[i] and @views[@nowIndex]
       @views[@nowIndex].unselect()
@@ -202,6 +373,7 @@ class IndexView extends Backbone.View
       @nowIndex = i
       @views[i].select()
       @views[i].scroll()
+      @nowScrollIndex = 1
 
   editing:(e)->
     textareaEle = @getTextareaEle()
@@ -220,14 +392,13 @@ class IndexView extends Backbone.View
     if @model
       @model.set
         title:line[0]
-        ans1:line[1]
         text:textarea
       @model.save()
     else
       @model = Datas.create
         title:line[0]
-        ans1:line[1]
         text:textarea
+    @clickedDataView.update()
 
   getTextareaEle:()->
     if not @textareaEl
@@ -257,35 +428,12 @@ class IndexView extends Backbone.View
   setTextareaTitle:(line,now_line_num)->
     if not @textareaTitleEle
       @textareaTitleEle = @$("#content-left-wrap .title")
-    if not @textareaAns1Ele
-      @textareaAns1Ele = @$("#content-left-wrap .ans1")
-    if not @textareaWordsEle
-      @textareaWordsEle = $(@$("#content-left-wrap .words")[0])
 
     if not line or not line[0]
       title = ""
     else
       title = line[0]
-    if not line or not line[1]
-      ans1 = ""
-    else
-      ans1 = line[1]
     @textareaTitleEle.html title
-    @textareaAns1Ele.html ans1
-    @textareaWordsEle.html ""
-    if not @model
-      return
-    if now_line_num < 7
-      start_line = 0
-    else
-      start_line = now_line_num-3
-    els = @model.get_word_els start_line,7
-    divEle = document.createElement "div"
-    for el in els
-      divEle.appendChild el
-    @textareaWordsEle.append divEle
-
-
 
   addWord:(word = "")->
     if word is ""
@@ -301,6 +449,7 @@ class IndexView extends Backbone.View
 
   isSearch:true
   old_search_text:""
+
   search:(e)->
     searchbarEle = @getSearchbarEle()
     text = searchbarEle.val()
@@ -308,6 +457,8 @@ class IndexView extends Backbone.View
       @old_search_text = text
       datas = Datas.filter (obj)->
         return obj.get("title").search(text) isnt -1
+      datas = _.sortBy datas,(item)->
+        -item.get "access"
       @clear()
       if datas.length is 0 and @isSearch
         @isSearch = false
@@ -344,33 +495,28 @@ class IndexView extends Backbone.View
         if collection.length is 0
           Datas.create
             title:"How to use search"
-            ans1:"1. Type tab. then focus searchbar"
-            ans2:"2. Type \"use\" and enter. then the results show and focus search result"
-            ans3:"3. Type j or k (Down or Up) and enter. then move to search bar results and focus textarea"
             text:"How to use search and edit\n1. Type tab. then focus searchbar\n2. Type \"use\". then the results show and focus search result\n3. Type j or k (Down or Up) and enter. then move to search bar results and focus textarea\n"
           Datas.create
             title:"How to use textarea"
-            ans1:"1. Type tab. then focus serchbar"
-            ans2:"2. Type \"first text\" and enter. then the new text is created and focus textarea"
-            ans3:"The text is always saved when you type"
-            text:"How to use textarea\n1. Type tab. then focus serchbar\n2. Type \"first text\" and enter. then the new text is created and focus textarea\nThe text is always saved when you type\n"
+            text:"How to use textarea\n@@1@@2@@3@@4\nType tab. then focus serchbar@@1\nType \"first text\" and enter. then the new text is created and focus textarea@@2\nThe text is always saved when you type@@3\ntest@@4"
           Datas.create
             title:"Follow me"
-            ans1:"I am Rei Kubonaga"
-            ans2:"I am working at Kwl-E"
-            ans3:"if you have something to think, please send me the message"
             text:"Follow me\nI am Rei Kubonaga\nI studied mathematics in Kyoto University and working in Kwl-E\nif you have something to think, please send me the message\nhttps://twitter.com/kubonagarei\nenable link"
           Datas.each self.addOne
           self.views[0].edit()
     )
+    $("#editing").height $(window).height()-170
 
   render_textarea:(model)->
     @model = model
+    if @model
+      @model.show()
     textarea = @model.get "text"
     line = textarea.split("\n")
     @setTextareaTitle line,0
     textareaEle = @getTextareaEle()
     textareaEle.val textarea
+
   render_new:()->
     @model = null
     @setTextareaTitle()
@@ -399,9 +545,8 @@ class IndexView extends Backbone.View
     @model = null
 
   addAll:()->
-    datas = Datas.sortBy((item)->
-      item.cid
-    )
+    datas = Datas.sortBy (item)->
+      -item.get "access"
     if not datas or datas.length is 0
     else
       _.each datas,@addOne

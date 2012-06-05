@@ -4,6 +4,8 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
+  if (typeof doc === "undefined" || doc === null) doc = document;
+
   Data = (function(_super) {
 
     __extends(Data, _super);
@@ -14,17 +16,20 @@
 
     Data.prototype["default"] = {
       title: "",
-      ans1: ""
+      access: 0
     };
 
     Data.prototype.initialize = function() {
-      return this.on("change", function(model) {
+      var self;
+      self = this;
+      this.on("change", function(model) {
         var date, time;
         date = new Date();
         time = date.getTime();
-        if (this.isNew()) model.set("created", time);
-        return model.set("updated", time);
+        if (self.isNew()) self.set("created", time);
+        return self.set("updated", time);
       });
+      if (!this.get("access")) return this.set("access", 0);
     };
 
     Data.prototype.clear = function() {
@@ -32,19 +37,37 @@
     };
 
     Data.prototype.get_word_els = function(start, length) {
-      var a, ans_word_num, d, els, first, i, j, left, line, now_left, now_length, span, text, text_arr, textarea, _ref, _ref2;
+      var a, ans_word_num, d, d2, d3, data, display_tags, div, div_arr, div_box, els, first, i, j, left, line, name_tags, now_left, now_length, second, span, t, table, tag, tags, td, text, text_arr, textarea, tr, _i, _j, _len, _len2, _ref, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _t;
       if (start == null) start = 0;
       if (length == null) length = 0;
       textarea = this.get("text");
       line = textarea.split("\n");
-      ans_word_num = 2;
+      ans_word_num = 1;
       if (line.length < ans_word_num + 1) return false;
       if (length === 0) length = line.length;
       els = [];
       left = 0;
       first = true;
-      now_length = 0;
+      tags = {};
       for (i = ans_word_num, _ref = line.length - 1; ans_word_num <= _ref ? i <= _ref : i >= _ref; ans_word_num <= _ref ? i++ : i--) {
+        text = line[i];
+        if (text.search(/^@@/) !== -1) continue;
+        if (text.search(/^\*@@/) !== -1) continue;
+        if (text.search(/@@/) !== -1) {
+          text_arr = text.split("@@");
+          data = text_arr[0];
+          for (j = 1, _ref2 = text_arr.length - 1; 1 <= _ref2 ? j <= _ref2 : j >= _ref2; 1 <= _ref2 ? j++ : j--) {
+            tag = text_arr[j];
+            if (!tags[tag]) {
+              tags[tag] = [data];
+            } else {
+              tags[tag].push(data);
+            }
+          }
+        }
+      }
+      now_length = 0;
+      for (i = ans_word_num, _ref3 = line.length - 1; ans_word_num <= _ref3 ? i <= _ref3 : i >= _ref3; ans_word_num <= _ref3 ? i++ : i--) {
         now_left = left;
         if (!line[i] || line[i] === "") {
           if (left > 0) left -= 1;
@@ -76,10 +99,25 @@
         } else if (text.search(/^!/) !== -1) {
           span.className = "word sub";
           span.innerHTML = line[i].substr(1);
+        } else if (text.search(/<->/) !== -1) {
+          span.className = "word flow";
+          text_arr = text.split("<->");
+          for (j = 0, _ref4 = text_arr.length - 1; 0 <= _ref4 ? j <= _ref4 : j >= _ref4; 0 <= _ref4 ? j++ : j--) {
+            text = text_arr[j];
+            if (text === "") continue;
+            d = document.createElement("div");
+            d.innerHTML = text;
+            span.appendChild(d);
+            if (text_arr.length - 1 !== j) {
+              d = document.createElement("div");
+              d.innerHTML = "◀▶";
+              span.appendChild(d);
+            }
+          }
         } else if (text.search(/->/) !== -1) {
           span.className = "word flow";
           text_arr = text.split("->");
-          for (j = 0, _ref2 = text_arr.length - 1; 0 <= _ref2 ? j <= _ref2 : j >= _ref2; 0 <= _ref2 ? j++ : j--) {
+          for (j = 0, _ref5 = text_arr.length - 1; 0 <= _ref5 ? j <= _ref5 : j >= _ref5; 0 <= _ref5 ? j++ : j--) {
             text = text_arr[j];
             if (text === "") continue;
             d = document.createElement("div");
@@ -88,6 +126,133 @@
             if (text_arr.length - 1 !== j) {
               d = document.createElement("div");
               d.innerHTML = "▶";
+              span.appendChild(d);
+            }
+          }
+        } else if (text.search(/^\*@@.+@@.+@@.+@@.+/) !== -1) {
+          span.className = "axis";
+          text_arr = text.split("@@");
+          name_tags = [];
+          for (j = 1; j <= 4; j++) {
+            t = text_arr[j];
+            if (t.search(/^.+\[.+\]$/) !== -1) {
+              _t = t.split("[");
+              text_arr[j] = _t[0];
+              name_tags.push(_t[1].substr(0, _t[1].length - 1));
+            } else {
+              name_tags.push(t);
+            }
+          }
+          div_arr = [];
+          for (j = 0; j <= 3; j++) {
+            if (j % 2 === 0) div_box = doc.createElement("div");
+            first = j > 1 ? 1 : 0;
+            second = j % 2 + 2;
+            display_tags = _.intersection(tags[text_arr[first + 1]], tags[text_arr[second + 1]]);
+            div = doc.createElement("div");
+            div.className = "box box" + j;
+            if (j === 1) {
+              tag = name_tags[first];
+              d = doc.createElement("div");
+              d.className = "tag tag1";
+              d.innerHTML = tag;
+              div.appendChild(d);
+            }
+            if (j === 2) {
+              tag = name_tags[second];
+              d = doc.createElement("div");
+              d.className = "tag tag2";
+              d.innerHTML = tag;
+              div.appendChild(d);
+            }
+            if (j === 3) {
+              tag = name_tags[second];
+              d = doc.createElement("div");
+              d.className = "tag tag3";
+              d.innerHTML = tag;
+              div.appendChild(d);
+            }
+            if (display_tags.length !== 0) {
+              for (_i = 0, _len = display_tags.length; _i < _len; _i++) {
+                data = display_tags[_i];
+                d = doc.createElement("div");
+                d.className = "word";
+                d.innerHTML = data;
+                div.appendChild(d);
+              }
+            }
+            div_box.appendChild(div);
+            div_arr.push(div);
+            if (j % 2 === 1) {
+              d = doc.createElement("div");
+              d.className = "clearfix";
+              div_box.appendChild(d);
+              span.appendChild(div_box);
+            }
+          }
+          tag = name_tags[first];
+          d = doc.createElement("div");
+          d2 = doc.createElement("div");
+          d2.className = "tag4_box";
+          d3 = doc.createElement("div");
+          d3.className = "tag tag4";
+          d3.innerHTML = tag;
+          d2.appendChild(d3);
+          d.appendChild(d2);
+          span.appendChild(d);
+        } else if (text.search(/^@@.+@@.+@@.+@@.+/) !== -1) {
+          span.className = "matrix";
+          text_arr = text.split("@@");
+          table = doc.createElement("table");
+          name_tags = [];
+          for (j = 1; j <= 4; j++) {
+            t = text_arr[j];
+            if (t.search(/^.+\[.+\]$/) !== -1) {
+              _t = t.split("[");
+              text_arr[j] = _t[0];
+              name_tags.push(_t[1].substr(0, _t[1].length - 1));
+            } else {
+              name_tags.push(t);
+            }
+          }
+          for (j = 1, _ref6 = text_arr.length - 1; 1 <= _ref6 ? j <= _ref6 : j >= _ref6; 1 <= _ref6 ? j++ : j--) {
+            if (j % 2 === 1) tr = doc.createElement("tr");
+            tag = text_arr[j];
+            td = doc.createElement("td");
+            d = doc.createElement("div");
+            d.className = "tag";
+            d.innerHTML = name_tags[j - 1];
+            td.appendChild(d);
+            if (tags[tag]) {
+              _ref7 = tags[tag];
+              for (_j = 0, _len2 = _ref7.length; _j < _len2; _j++) {
+                data = _ref7[_j];
+                d = doc.createElement("div");
+                d.className = "word";
+                d.innerHTML = data;
+                td.appendChild(d);
+              }
+            }
+            tr.appendChild(td);
+            if (j % 2 === 0) table.appendChild(tr);
+          }
+          span.appendChild(table);
+        } else if (text.search(/@@/) !== -1) {
+          span.className = "word tags";
+          text_arr = text.split("@@");
+          d = document.createElement("div");
+          d.innerHTML = text_arr[0];
+          span.appendChild(d);
+          for (j = 1, _ref8 = text_arr.length - 1; 1 <= _ref8 ? j <= _ref8 : j >= _ref8; 1 <= _ref8 ? j++ : j--) {
+            text = text_arr[j];
+            if (text === "") continue;
+            d = document.createElement("div");
+            d.className = "tag";
+            d.innerHTML = text;
+            span.appendChild(d);
+            if (text_arr.length - 1 !== j) {
+              d = document.createElement("div");
+              d.innerHTML = "";
               span.appendChild(d);
             }
           }
@@ -104,7 +269,7 @@
         if (now_left !== left && !first) els.push(document.createElement("br"));
         els.push(span);
         if (first) first = false;
-        if (left > 0) els.push(document.createElement("br"));
+        els.push(document.createElement("br"));
         now_length += 1;
       }
       return els;
@@ -121,6 +286,12 @@
         }
       }
       return output;
+    };
+
+    Data.prototype.show = function() {
+      var n;
+      n = this.get("access");
+      return this.set("access", n + 1);
     };
 
     return Data;
@@ -155,10 +326,7 @@
 
     DataView.prototype.events = function() {
       return {
-        "click .show": "show",
-        "click .edit": "edit",
-        "click .paste": "paste",
-        "click .word": "addWord"
+        "click .edit": "edit"
       };
     };
 
@@ -171,49 +339,37 @@
     DataView.prototype.className = "data";
 
     DataView.prototype.render = function() {
-      if (!this.model.get("ans1")) {
-        this.model.set("ans1", "");
-        this.model.save();
-      }
+      var div;
       if (!this.model.get("title")) {
         this.model.destroy();
         return false;
       }
       if (!this.model.get("text")) {
-        this.model.set("text", this.model.get("title") + "\n" + this.model.get("ans1"));
+        this.model.set("text", this.model.get("title"));
         this.model.save();
       }
-      this.$el.html(this.template());
+      div = doc.createElement("div");
+      div.innerHTML = this.template();
+      this.$el.prepend(div);
       this.show();
       return this;
+    };
+
+    DataView.prototype.update = function() {
+      this.render();
+      return $(this.$el.children()[1]).remove();
     };
 
     DataView.prototype.setParent = function(view) {
       return this.parent = view;
     };
 
-    DataView.prototype.isShow = false;
-
-    DataView.prototype.show = function(e) {
-      if (!this.isShow) {
-        $(this.$(".show-list")[0]).append(this.model.get_word());
-        return this.isShow = true;
-      } else {
-        $(this.$(".show-list")[0]).html("");
-        return this.isShow = false;
-      }
+    DataView.prototype.show = function() {
+      return $(this.$(".show-list")[0]).append(this.model.get_word());
     };
 
     DataView.prototype.edit = function() {
       return this.parent.render_textarea(this.model);
-    };
-
-    DataView.prototype.addWord = function(e) {
-      return this.parent.addWord($(e.target).text());
-    };
-
-    DataView.prototype.paste = function() {
-      return this.parent.addWord($(this.$(".title .edit")[0]).html());
     };
 
     DataView.prototype.select = function() {
@@ -262,25 +418,46 @@
     };
 
     IndexView.prototype.list_keydown = function(e) {
-      var textareaEle;
+      var height, sum, textareaEle;
       if (e.keyCode === 9) {
         textareaEle = this.getTextareaEle();
         textareaEle.focus();
         if (this.views[this.nowIndex]) this.views[this.nowIndex].unselect();
         return false;
       }
-      if (e.keyCode === 40 || e.keyCode === 74) this.focus_data(this.nowIndex + 1);
-      if (e.keyCode === 38 || e.keyCode === 75) this.focus_data(this.nowIndex - 1);
+      height = $(window).height() - 170;
+      sum = Math.ceil($(this.views[this.nowIndex].el).height() / height);
+      if (e.keyCode === 40 || e.keyCode === 74) {
+        if (this.nowScrollIndex < sum) {
+          $(window).scrollTop($(window).scrollTop() + height);
+          this.nowScrollIndex += 1;
+        } else {
+          this.focus_data(this.nowIndex + 1);
+        }
+      }
+      if (e.keyCode === 38 || e.keyCode === 75) {
+        if (this.nowScrollIndex > 1) {
+          $(window).scrollTop($(window).scrollTop() - height);
+          this.nowScrollIndex -= 1;
+        } else {
+          this.focus_data(this.nowIndex - 1);
+        }
+      }
       if (e.keyCode === 13) {
         this.views[this.nowIndex].edit();
         textareaEle = this.getTextareaEle();
         textareaEle.focus();
         if (this.views[this.nowIndex]) this.views[this.nowIndex].unselect();
+        this.clickedDataView = this.views[this.nowIndex];
         return false;
       }
     };
 
+    IndexView.prototype.clickedDataView = false;
+
     IndexView.prototype.nowIndex = false;
+
+    IndexView.prototype.nowScrollIndex = 1;
 
     IndexView.prototype.focus_data = function(i) {
       if (this.views[i] && this.views[this.nowIndex]) {
@@ -289,7 +466,8 @@
       if (this.views[i]) {
         this.nowIndex = i;
         this.views[i].select();
-        return this.views[i].scroll();
+        this.views[i].scroll();
+        return this.nowScrollIndex = 1;
       }
     };
 
@@ -311,17 +489,16 @@
       if (this.model) {
         this.model.set({
           title: line[0],
-          ans1: line[1],
           text: textarea
         });
-        return this.model.save();
+        this.model.save();
       } else {
-        return this.model = Datas.create({
+        this.model = Datas.create({
           title: line[0],
-          ans1: line[1],
           text: textarea
         });
       }
+      return this.clickedDataView.update();
     };
 
     IndexView.prototype.getTextareaEle = function() {
@@ -358,42 +535,16 @@
     };
 
     IndexView.prototype.setTextareaTitle = function(line, now_line_num) {
-      var ans1, divEle, el, els, start_line, title, _i, _len;
+      var title;
       if (!this.textareaTitleEle) {
         this.textareaTitleEle = this.$("#content-left-wrap .title");
-      }
-      if (!this.textareaAns1Ele) {
-        this.textareaAns1Ele = this.$("#content-left-wrap .ans1");
-      }
-      if (!this.textareaWordsEle) {
-        this.textareaWordsEle = $(this.$("#content-left-wrap .words")[0]);
       }
       if (!line || !line[0]) {
         title = "";
       } else {
         title = line[0];
       }
-      if (!line || !line[1]) {
-        ans1 = "";
-      } else {
-        ans1 = line[1];
-      }
-      this.textareaTitleEle.html(title);
-      this.textareaAns1Ele.html(ans1);
-      this.textareaWordsEle.html("");
-      if (!this.model) return;
-      if (now_line_num < 7) {
-        start_line = 0;
-      } else {
-        start_line = now_line_num - 3;
-      }
-      els = this.model.get_word_els(start_line, 7);
-      divEle = document.createElement("div");
-      for (_i = 0, _len = els.length; _i < _len; _i++) {
-        el = els[_i];
-        divEle.appendChild(el);
-      }
-      return this.textareaWordsEle.append(divEle);
+      return this.textareaTitleEle.html(title);
     };
 
     IndexView.prototype.addWord = function(word) {
@@ -423,6 +574,9 @@
         this.old_search_text = text;
         datas = Datas.filter(function(obj) {
           return obj.get("title").search(text) !== -1;
+        });
+        datas = _.sortBy(datas, function(item) {
+          return -item.get("access");
         });
         this.clear();
         if (datas.length === 0 && this.isSearch) {
@@ -461,28 +615,19 @@
       Datas.bind("reset", this.addAll, this);
       Datas.bind("all", this.render, this);
       self = this;
-      return Datas.fetch({
+      Datas.fetch({
         success: function(collection) {
           if (collection.length === 0) {
             Datas.create({
               title: "How to use search",
-              ans1: "1. Type tab. then focus searchbar",
-              ans2: "2. Type \"use\" and enter. then the results show and focus search result",
-              ans3: "3. Type j or k (Down or Up) and enter. then move to search bar results and focus textarea",
               text: "How to use search and edit\n1. Type tab. then focus searchbar\n2. Type \"use\". then the results show and focus search result\n3. Type j or k (Down or Up) and enter. then move to search bar results and focus textarea\n"
             });
             Datas.create({
               title: "How to use textarea",
-              ans1: "1. Type tab. then focus serchbar",
-              ans2: "2. Type \"first text\" and enter. then the new text is created and focus textarea",
-              ans3: "The text is always saved when you type",
-              text: "How to use textarea\n1. Type tab. then focus serchbar\n2. Type \"first text\" and enter. then the new text is created and focus textarea\nThe text is always saved when you type\n"
+              text: "How to use textarea\n@@1@@2@@3@@4\nType tab. then focus serchbar@@1\nType \"first text\" and enter. then the new text is created and focus textarea@@2\nThe text is always saved when you type@@3\ntest@@4"
             });
             Datas.create({
               title: "Follow me",
-              ans1: "I am Rei Kubonaga",
-              ans2: "I am working at Kwl-E",
-              ans3: "if you have something to think, please send me the message",
               text: "Follow me\nI am Rei Kubonaga\nI studied mathematics in Kyoto University and working in Kwl-E\nif you have something to think, please send me the message\nhttps://twitter.com/kubonagarei\nenable link"
             });
             Datas.each(self.addOne);
@@ -490,11 +635,13 @@
           }
         }
       });
+      return $("#editing").height($(window).height() - 170);
     };
 
     IndexView.prototype.render_textarea = function(model) {
       var line, textarea, textareaEle;
       this.model = model;
+      if (this.model) this.model.show();
       textarea = this.model.get("text");
       line = textarea.split("\n");
       this.setTextareaTitle(line, 0);
@@ -535,7 +682,7 @@
     IndexView.prototype.addAll = function() {
       var datas, textareaEle;
       datas = Datas.sortBy(function(item) {
-        return item.cid;
+        return -item.get("access");
       });
       if (!datas || datas.length === 0) {} else {
         _.each(datas, this.addOne);

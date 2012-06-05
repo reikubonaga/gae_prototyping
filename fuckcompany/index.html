@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>Protyping Lab Corridor</title>
+		<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link href="/static/css/bootstrap.css" rel="stylesheet">
+    <link href="/static/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="css/index.css" rel="stylesheet">
+    </head>
+  <body>
+    <div>
+      
+    </div>
+    
+    <script src="/static/js/three.js"></script>
+    <script src="/static/js/jquery.js"></script> 
+    <script src="/static/js/json2.js"></script>
+    <script src="/static/js/underscore.js"></script>
+    <script src="/static/js/backbone.js"></script>
+    <script src="/static/js/widgets.js"></script>
+    <script src="/static/js/bootstrap-transition.js"></script>
+    <script src="/static/js/bootstrap-alert.js"></script>
+    <script src="/static/js/bootstrap-modal.js"></script>
+    <script src="/static/js/bootstrap-tooltip.js"></script>
+    <script src="/static/js/bootstrap-popover.js"></script>
+    <script src="/static/js/jquery.mousewheel.js"></script>
+    <script src="js/index.js"></script>
+    <div id="fb-root"></div>
+    <script>
+      window.fbAsyncInit = function() {
+        window.Corridor = window.Corridor?window.Corridor:{};
+        window.Corridor.FB = FB;
+        FB.init({
+          appId:'191040330938892',
+          status     : true, 
+          cookie     : true, 
+          xfbml      : true 
+        });
+        FB.getLoginStatus(function(response) {
+          if (response.status == "connected") {
+            console.log("logined");
+            FB.api('/me/friends',function(response){
+              window.Corridor.topView.friends = response["data"];
+            });          
+          }
+        });
+
+      };
+      
+      (function(d){
+      var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+      if (d.getElementById(id)) {return;}
+      js = d.createElement('script'); js.id = id; js.async = true;
+      js.src = "//connect.facebook.net/en_US/all.js";
+      ref.parentNode.insertBefore(js, ref);
+      }(document));
+    </script>
+  </body>
+</html>
