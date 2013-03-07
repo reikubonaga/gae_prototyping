@@ -179,9 +179,7 @@
 
     TopView.prototype.make_cube = function(x, url, isLeft) {
       var cube, i, material, materials, materials2, texture, z_i;
-      if (url == null) {
-        url = "https://blog.so-net.ne.jp/_images/blog/_f94/nasser/leonid_afremov_art_work_2.jpg";
-      }
+      if (url == null) url = "img/arraies.png";
       texture = new THREE.ImageUtils.loadTexture(url);
       material = new THREE.MeshLambertMaterial({
         map: texture

@@ -23,6 +23,7 @@ class Data extends Backbone.Model
   clear:()->
     @destroy()
 
+  #右の一覧に表示するときのelementsを取得
   get_word_els:(start=0,length=0)->
     textarea = @get "text"
     line = textarea.split("\n")
@@ -39,12 +40,8 @@ class Data extends Backbone.Model
     tags = {}
     for i in [ans_word_num..line.length-1]
       text = line[i]
-      if text.search(/^@@/) isnt -1
-        continue
-      if text.search(/^\*@@/) isnt -1
-        continue
-      if text.search(/@@/) isnt -1
-        text_arr = text.split "@@"
+      if text.search(/\s@/) isnt -1
+        text_arr = text.split " @"
         data = text_arr[0]
         for j in [1..text_arr.length-1]
           tag = text_arr[j]
@@ -127,12 +124,14 @@ class Data extends Backbone.Model
           else
             name_tags.push t
         div_arr = []
+        display_tags_obj = {}
         for j in [0..3]
           if j%2 is 0
             div_box = doc.createElement "div"
           first = if j > 1 then 1 else 0
           second = j%2 + 2
           display_tags = _.intersection tags[text_arr[first+1]],tags[text_arr[second+1]]
+          display_tags_obj[j] = display_tags
           div = doc.createElement "div"
           div.className = "box box"+j
           if j is 1
@@ -178,6 +177,13 @@ class Data extends Backbone.Model
         d.appendChild d2
         span.appendChild d
 
+        #box1とbox2の高さを調整
+        if display_tags_obj[0].length < display_tags_obj[1].length
+          $(".box0",span).height display_tags_obj[1].length * 21
+        if display_tags_obj[2].length < display_tags_obj[3].length
+          $(".box2",span).height display_tags_obj[3].length * 21
+
+
       else if text.search(/^@@.+@@.+@@.+@@.+/) isnt -1
         span.className = "matrix"
         text_arr = text.split "@@"
@@ -211,9 +217,9 @@ class Data extends Backbone.Model
             table.appendChild tr
         span.appendChild table
 
-      else if text.search(/@@/) isnt -1
+      else if text.search(/\s@/) isnt -1
         span.className = "word tags"
-        text_arr = text.split "@@"
+        text_arr = text.split " @"
         d = document.createElement "div"
         d.innerHTML = text_arr[0]
         span.appendChild d
@@ -255,19 +261,41 @@ class Data extends Backbone.Model
         output.appendChild el
     return output
 
-  show:()->
+  count:()->
     n = @get "access"
     @set "access",n+1
 
 class DataList extends Backbone.Collection
   model:Data
   localStorage: new Store("idea-data")
+  #csv形式でexportする
+  export: ()->
+    console.log "export"
 
 Datas = new DataList
+
+class History extends Backbone.Model
+  
+#title memo
+class Histories extends Backbone.Collection
+  model:History
+  last_pull_time:0
+  last_push_time:0
+  push:()->
+    console.log "push"
+  pull:()->
+    console.log "pull"
+  commit:()->
+    console.log "pull"
+  #いくつかのデータをまとめて受け取ったとき
+  import:()->
+    console.log ""
+
 
 class DataView extends Backbone.View
   events:()->
     "click .edit":"edit"
+    "click .delete":"delete"
   template:()->
     _.template $("#data_template").html(),@model.toJSON()
   tag:"div"
@@ -291,15 +319,12 @@ class DataView extends Backbone.View
 
   setParent:(view)->
     @parent = view
+
   show:()->
     $(@$(".show-list")[0]).append @model.get_word()
+
   edit:()->
     @parent.render_textarea @model
-
-#  addWord:(e)->
-#    @parent.addWord $(e.target).text()
-#  paste:()->
-#    @parent.addWord $(@$(".title .edit")[0]).html()
 
   select:()->
     $(@$(".selectertext")[0]).html "▶"
@@ -308,6 +333,19 @@ class DataView extends Backbone.View
   scroll:()->
     $(window).scrollTop @$el.position().top - 110
 
+  delete:(e)->
+    if confirm("delete?")
+      if @model
+        @model.destroy()
+      @parent.render_new()
+      @parent.clear()
+      @parent.old_search_text = false
+      @parent.search()
+      if @parent.views[0]
+        @parent.views[0].scroll()
+    @model = null
+
+#全体view
 class IndexView extends Backbone.View
   el:"body"
   events:
@@ -318,7 +356,6 @@ class IndexView extends Backbone.View
     "click #search_bar .button":"search"
     "focus #search_list_input":"list_focus"
     "keydown #search_list_input":"list_keydown"
-    "click .delete":"delete"
     "click .menu .new":"render_new"
     "click .save":"editing"
 
@@ -388,17 +425,21 @@ class IndexView extends Backbone.View
       now_line = arr.length+1
     else
       now_line = 1
-    @setTextareaTitle line,now_line
+    @setTextareaTitle line
     if @model
       @model.set
         title:line[0]
         text:textarea
       @model.save()
     else
-      @model = Datas.create
-        title:line[0]
-        text:textarea
-    @clickedDataView.update()
+      @create line[0],textarea
+    if @clickedDataView
+      @clickedDataView.update()
+
+  create:(title,text)->
+    @model = Datas.create
+      title:title
+      text:text
 
   getTextareaEle:()->
     if not @textareaEl
@@ -425,7 +466,7 @@ class IndexView extends Backbone.View
       @resultListInputEle = @$("#search_list_input")
     @resultListInputEle
 
-  setTextareaTitle:(line,now_line_num)->
+  setTextareaTitle:(line)->
     if not @textareaTitleEle
       @textareaTitleEle = @$("#content-left-wrap .title")
 
@@ -435,22 +476,10 @@ class IndexView extends Backbone.View
       title = line[0]
     @textareaTitleEle.html title
 
-  addWord:(word = "")->
-    if word is ""
-      return
-    textareaEle = @getTextareaEle()
-    textarea = textareaEle.val()
-    if textarea is ""
-      textarea += word
-    else
-      textarea += "\n"+word
-    textareaEle.val textarea
-    @editing()
-
   isSearch:true
   old_search_text:""
 
-  search:(e)->
+  search:(e = false)->
     searchbarEle = @getSearchbarEle()
     text = searchbarEle.val()
     if text isnt @old_search_text
@@ -478,6 +507,10 @@ class IndexView extends Backbone.View
         text = text.replace "\n", ""
         textareaEle.val text
         textareaEle.focus()
+        @create text,text
+        @old_search_text = false
+        @search()
+        @clickedDataView = @views[0]
         return false
       else
         el = @getResultListInputEle()
@@ -510,10 +543,10 @@ class IndexView extends Backbone.View
   render_textarea:(model)->
     @model = model
     if @model
-      @model.show()
+      @model.count()
     textarea = @model.get "text"
     line = textarea.split("\n")
-    @setTextareaTitle line,0
+    @setTextareaTitle line
     textareaEle = @getTextareaEle()
     textareaEle.val textarea
 
@@ -523,26 +556,11 @@ class IndexView extends Backbone.View
     textareaEle = @getTextareaEle()
     textareaEle.val ""
 
-  render:(event,model)->
-    #console.log model
-
   views:[]
   clear:()->
     @getResultListEle().html ""
     @views = []
     @nowIndex = false
-
-  delete:(e)->
-    if confirm("delete?")
-      if @model
-        @model.destroy()
-      @render_new()
-      @clear()
-      @old_search_text = false
-      @search()
-      if @views[0]
-        @views[0].scroll()
-    @model = null
 
   addAll:()->
     datas = Datas.sortBy (item)->

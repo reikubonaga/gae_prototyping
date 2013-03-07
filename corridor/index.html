@@ -30,9 +30,9 @@
         <a href="#" class="btn closefun">Close</a>
       </div>
     </div>
-    
-    <script src="/static/js/three.js"></script>
-    <script src="/static/js/jquery.js"></script> 
+
+    <script src="/static/js/Three.js"></script>
+    <script src="/static/js/jquery.js"></script>
     <script src="/static/js/json2.js"></script>
     <script src="/static/js/underscore.js"></script>
     <script src="/static/js/backbone.js"></script>
@@ -51,21 +51,21 @@
         window.Corridor.FB = FB;
         FB.init({
           appId:'191040330938892',
-          status     : true, 
-          cookie     : true, 
-          xfbml      : true 
+          status     : true,
+          cookie     : true,
+          xfbml      : true
         });
         FB.getLoginStatus(function(response) {
           if (response.status == "connected") {
             console.log("logined");
             FB.api('/me/friends',function(response){
               window.Corridor.topView.friends = response["data"];
-            });          
+            });
           }
         });
 
       };
-      
+
       (function(d){
       var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
       if (d.getElementById(id)) {return;}

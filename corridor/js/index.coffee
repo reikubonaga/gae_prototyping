@@ -126,7 +126,7 @@ class Corridor.TopView extends Backbone.View
     @make_cube(0,url,true)
 
   make_cube:(x,url,isLeft)=>
-    url ?= "https://blog.so-net.ne.jp/_images/blog/_f94/nasser/leonid_afremov_art_work_2.jpg";
+    url ?= "img/arraies.png";
     texture = new THREE.ImageUtils.loadTexture url
     material = new THREE.MeshLambertMaterial
       map:texture

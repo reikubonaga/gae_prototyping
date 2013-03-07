@@ -1,5 +1,5 @@
 (function() {
-  var Data, DataList, DataView, Datas, IndexView,
+  var Data, DataList, DataView, Datas, Histories, History, IndexView,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
@@ -37,7 +37,7 @@
     };
 
     Data.prototype.get_word_els = function(start, length) {
-      var a, ans_word_num, d, d2, d3, data, display_tags, div, div_arr, div_box, els, first, i, j, left, line, name_tags, now_left, now_length, second, span, t, table, tag, tags, td, text, text_arr, textarea, tr, _i, _j, _len, _len2, _ref, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _t;
+      var a, ans_word_num, d, d2, d3, data, display_tags, display_tags_obj, div, div_arr, div_box, els, first, i, j, left, line, name_tags, now_left, now_length, second, span, t, table, tag, tags, td, text, text_arr, textarea, tr, _i, _j, _len, _len2, _ref, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _t;
       if (start == null) start = 0;
       if (length == null) length = 0;
       textarea = this.get("text");
@@ -51,10 +51,8 @@
       tags = {};
       for (i = ans_word_num, _ref = line.length - 1; ans_word_num <= _ref ? i <= _ref : i >= _ref; ans_word_num <= _ref ? i++ : i--) {
         text = line[i];
-        if (text.search(/^@@/) !== -1) continue;
-        if (text.search(/^\*@@/) !== -1) continue;
-        if (text.search(/@@/) !== -1) {
-          text_arr = text.split("@@");
+        if (text.search(/\s@/) !== -1) {
+          text_arr = text.split(" @");
           data = text_arr[0];
           for (j = 1, _ref2 = text_arr.length - 1; 1 <= _ref2 ? j <= _ref2 : j >= _ref2; 1 <= _ref2 ? j++ : j--) {
             tag = text_arr[j];
@@ -144,11 +142,13 @@
             }
           }
           div_arr = [];
+          display_tags_obj = {};
           for (j = 0; j <= 3; j++) {
             if (j % 2 === 0) div_box = doc.createElement("div");
             first = j > 1 ? 1 : 0;
             second = j % 2 + 2;
             display_tags = _.intersection(tags[text_arr[first + 1]], tags[text_arr[second + 1]]);
+            display_tags_obj[j] = display_tags;
             div = doc.createElement("div");
             div.className = "box box" + j;
             if (j === 1) {
@@ -200,6 +200,12 @@
           d2.appendChild(d3);
           d.appendChild(d2);
           span.appendChild(d);
+          if (display_tags_obj[0].length < display_tags_obj[1].length) {
+            $(".box0", span).height(display_tags_obj[1].length * 21);
+          }
+          if (display_tags_obj[2].length < display_tags_obj[3].length) {
+            $(".box2", span).height(display_tags_obj[3].length * 21);
+          }
         } else if (text.search(/^@@.+@@.+@@.+@@.+/) !== -1) {
           span.className = "matrix";
           text_arr = text.split("@@");
@@ -237,9 +243,9 @@
             if (j % 2 === 0) table.appendChild(tr);
           }
           span.appendChild(table);
-        } else if (text.search(/@@/) !== -1) {
+        } else if (text.search(/\s@/) !== -1) {
           span.className = "word tags";
-          text_arr = text.split("@@");
+          text_arr = text.split(" @");
           d = document.createElement("div");
           d.innerHTML = text_arr[0];
           span.appendChild(d);
@@ -288,7 +294,7 @@
       return output;
     };
 
-    Data.prototype.show = function() {
+    Data.prototype.count = function() {
       var n;
       n = this.get("access");
       return this.set("access", n + 1);
@@ -310,11 +316,61 @@
 
     DataList.prototype.localStorage = new Store("idea-data");
 
+    DataList.prototype["export"] = function() {
+      return console.log("export");
+    };
+
     return DataList;
 
   })(Backbone.Collection);
 
   Datas = new DataList;
+
+  History = (function(_super) {
+
+    __extends(History, _super);
+
+    function History() {
+      History.__super__.constructor.apply(this, arguments);
+    }
+
+    return History;
+
+  })(Backbone.Model);
+
+  Histories = (function(_super) {
+
+    __extends(Histories, _super);
+
+    function Histories() {
+      Histories.__super__.constructor.apply(this, arguments);
+    }
+
+    Histories.prototype.model = History;
+
+    Histories.prototype.last_pull_time = 0;
+
+    Histories.prototype.last_push_time = 0;
+
+    Histories.prototype.push = function() {
+      return console.log("push");
+    };
+
+    Histories.prototype.pull = function() {
+      return console.log("pull");
+    };
+
+    Histories.prototype.commit = function() {
+      return console.log("pull");
+    };
+
+    Histories.prototype["import"] = function() {
+      return console.log("");
+    };
+
+    return Histories;
+
+  })(Backbone.Collection);
 
   DataView = (function(_super) {
 
@@ -326,7 +382,8 @@
 
     DataView.prototype.events = function() {
       return {
-        "click .edit": "edit"
+        "click .edit": "edit",
+        "click .delete": "delete"
       };
     };
 
@@ -384,6 +441,18 @@
       return $(window).scrollTop(this.$el.position().top - 110);
     };
 
+    DataView.prototype["delete"] = function(e) {
+      if (confirm("delete?")) {
+        if (this.model) this.model.destroy();
+        this.parent.render_new();
+        this.parent.clear();
+        this.parent.old_search_text = false;
+        this.parent.search();
+        if (this.parent.views[0]) this.parent.views[0].scroll();
+      }
+      return this.model = null;
+    };
+
     return DataView;
 
   })(Backbone.View);
@@ -407,7 +476,6 @@
       "click #search_bar .button": "search",
       "focus #search_list_input": "list_focus",
       "keydown #search_list_input": "list_keydown",
-      "click .delete": "delete",
       "click .menu .new": "render_new",
       "click .save": "editing"
     };
@@ -485,7 +553,7 @@
       } else {
         now_line = 1;
       }
-      this.setTextareaTitle(line, now_line);
+      this.setTextareaTitle(line);
       if (this.model) {
         this.model.set({
           title: line[0],
@@ -493,12 +561,16 @@
         });
         this.model.save();
       } else {
-        this.model = Datas.create({
-          title: line[0],
-          text: textarea
-        });
+        this.create(line[0], textarea);
       }
-      return this.clickedDataView.update();
+      if (this.clickedDataView) return this.clickedDataView.update();
+    };
+
+    IndexView.prototype.create = function(title, text) {
+      return this.model = Datas.create({
+        title: title,
+        text: text
+      });
     };
 
     IndexView.prototype.getTextareaEle = function() {
@@ -534,7 +606,7 @@
       return this.resultListInputEle;
     };
 
-    IndexView.prototype.setTextareaTitle = function(line, now_line_num) {
+    IndexView.prototype.setTextareaTitle = function(line) {
       var title;
       if (!this.textareaTitleEle) {
         this.textareaTitleEle = this.$("#content-left-wrap .title");
@@ -547,27 +619,13 @@
       return this.textareaTitleEle.html(title);
     };
 
-    IndexView.prototype.addWord = function(word) {
-      var textarea, textareaEle;
-      if (word == null) word = "";
-      if (word === "") return;
-      textareaEle = this.getTextareaEle();
-      textarea = textareaEle.val();
-      if (textarea === "") {
-        textarea += word;
-      } else {
-        textarea += "\n" + word;
-      }
-      textareaEle.val(textarea);
-      return this.editing();
-    };
-
     IndexView.prototype.isSearch = true;
 
     IndexView.prototype.old_search_text = "";
 
     IndexView.prototype.search = function(e) {
       var data, datas, el, searchbarButtonEle, searchbarEle, text, textareaEle, _i, _len;
+      if (e == null) e = false;
       searchbarEle = this.getSearchbarEle();
       text = searchbarEle.val();
       if (text !== this.old_search_text) {
@@ -601,6 +659,10 @@
           text = text.replace("\n", "");
           textareaEle.val(text);
           textareaEle.focus();
+          this.create(text, text);
+          this.old_search_text = false;
+          this.search();
+          this.clickedDataView = this.views[0];
           return false;
         } else {
           el = this.getResultListInputEle();
@@ -641,10 +703,10 @@
     IndexView.prototype.render_textarea = function(model) {
       var line, textarea, textareaEle;
       this.model = model;
-      if (this.model) this.model.show();
+      if (this.model) this.model.count();
       textarea = this.model.get("text");
       line = textarea.split("\n");
-      this.setTextareaTitle(line, 0);
+      this.setTextareaTitle(line);
       textareaEle = this.getTextareaEle();
       return textareaEle.val(textarea);
     };
@@ -657,26 +719,12 @@
       return textareaEle.val("");
     };
 
-    IndexView.prototype.render = function(event, model) {};
-
     IndexView.prototype.views = [];
 
     IndexView.prototype.clear = function() {
       this.getResultListEle().html("");
       this.views = [];
       return this.nowIndex = false;
-    };
-
-    IndexView.prototype["delete"] = function(e) {
-      if (confirm("delete?")) {
-        if (this.model) this.model.destroy();
-        this.render_new();
-        this.clear();
-        this.old_search_text = false;
-        this.search();
-        if (this.views[0]) this.views[0].scroll();
-      }
-      return this.model = null;
     };
 
     IndexView.prototype.addAll = function() {

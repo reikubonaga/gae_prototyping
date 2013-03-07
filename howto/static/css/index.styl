@@ -1,0 +1,52 @@
+@charset "UTF-8"
+
+@import '../../../stylus/lib/reset'
+@import '../../../stylus/lib/func'
+
+body
+  font-family helvetica
+
+#header, #containers
+  width 1024px
+  margin auto
+
+#header
+  height 50px
+  .logo
+    height 40px
+    line-height 40px
+    font-size 150%
+
+#containers
+  .left, .right
+    float left
+  .left
+    width 650px
+  .right
+    width 330px
+  
+.tip
+  .image-wrap,.content
+    float left
+  .image-wrap
+    height 50px
+    width 60px
+  .content
+    width 590px
+    .name
+      color blue
+      font-size 90%
+    .title
+      padding-top 10px
+      span
+        color grey
+    .extra
+      line-height 15px
+      .tags
+        font-size 80%
+        span
+          color grey
+          margin-right 4px
+          border-bottom solid 1px grey    
+
+

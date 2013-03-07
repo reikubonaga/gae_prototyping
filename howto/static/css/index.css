@@ -1,0 +1,144 @@
+@charset "UTF-8";
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+font,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-weight: inherit;
+  font-style: inherit;
+  font-size: 100%;
+  font-family: inherit;
+  vertical-align: baseline;
+}
+img {
+  border: none;
+}
+strong {
+  font-weight: bold;
+}
+.clearfix:after {
+  content: "\0020";
+  display: block;
+  height: 0;
+  clear: both;
+  overflow: hidden;
+  visibility: hidden;
+}
+.clearfix {
+  display: inline-table;
+}
+body {
+  font-family: helvetica;
+}
+#header,
+#containers {
+  width: 1024px;
+  margin: auto;
+}
+#header {
+  height: 50px;
+}
+#header .logo {
+  height: 40px;
+  line-height: 40px;
+  font-size: 150%;
+}
+#containers .left,
+#containers .right {
+  float: left;
+}
+#containers .left {
+  width: 650px;
+}
+#containers .right {
+  width: 330px;
+}
+.tip .image-wrap,
+.tip .content {
+  float: left;
+}
+.tip .image-wrap {
+  height: 50px;
+  width: 60px;
+}
+.tip .content {
+  width: 590px;
+}
+.tip .content .name {
+  color: #00f;
+  font-size: 90%;
+}
+.tip .content .title {
+  padding-top: 10px;
+}
+.tip .content .title span {
+  color: #808080;
+}
+.tip .content .extra {
+  line-height: 15px;
+}
+.tip .content .extra .tags {
+  font-size: 80%;
+}
+.tip .content .extra .tags span {
+  color: #808080;
+  margin-right: 4px;
+  border-bottom: solid 1px #808080;
+}
